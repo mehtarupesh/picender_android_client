@@ -20,6 +20,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".DirectoryActivity"
+            android:label="@string/title_activity_directory" >
+        </activity>
+        <activity
             android:name=".DetailActivity"
             android:label="@string/title_activity_detail" >
         </activity>
