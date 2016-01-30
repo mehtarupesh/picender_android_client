@@ -80,7 +80,7 @@ public class DirectoryActivity extends AppCompatActivity {
         mAdapter = new GalleryAdapter(DirectoryActivity.this, data);
         mRecyclerView.setAdapter(mAdapter);
 
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, mRecyclerView,
                 new RecyclerItemClickListener.OnItemClickListener() {
 
                     @Override
@@ -91,6 +91,12 @@ public class DirectoryActivity extends AppCompatActivity {
                         intent.putExtra("pos", position);
                         startActivity(intent);
 
+                    }
+
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+
+                        Log.d("DirectoryActivity", "LONG PRESS!!!!");
                     }
                 }));
     }
