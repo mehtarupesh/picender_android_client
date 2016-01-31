@@ -2,6 +2,8 @@ package com.grafixartist.gallery;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 
@@ -98,7 +101,8 @@ public class DirectoryActivity extends AppCompatActivity {
                     @Override
                     public void onItemLongClick(View view, int position) {
 
-                        Log.d("DirectoryActivity", "LONG PRESS!!!!");
+                        ImageView mImg = (ImageView)view.findViewById(R.id.item_img);
+                        mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
                     }
                 }));
     }

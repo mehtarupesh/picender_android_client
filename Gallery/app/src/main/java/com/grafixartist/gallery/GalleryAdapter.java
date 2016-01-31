@@ -1,6 +1,8 @@
 package com.grafixartist.gallery;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,8 +48,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .override(200,200)
                     .crossFade()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .dontAnimate() /* to avoid getting pics washed out */
                     .into(((MyItemHolder) holder).mImg);
 
+            ((MyItemHolder)holder).mImg.clearColorFilter(); /* to avoid mass pic corruption */
     }
 
     @Override
