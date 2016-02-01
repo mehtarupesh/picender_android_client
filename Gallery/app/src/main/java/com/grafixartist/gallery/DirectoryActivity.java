@@ -27,35 +27,6 @@ public class DirectoryActivity extends AppCompatActivity {
     ArrayList<ImageModel> data = new ArrayList<>();
     String TAG = "DirectoryActivity";
 
-    public ArrayList<String> getImageIds(){
-
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        String[] projection = { MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.DATA };
-
-        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-
-        ArrayList<String> ids = new ArrayList<String>();
-        int count = cursor.getCount();
-        int i = 0;
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-                /*
-                Log.d(TAG, "ID -------> " + cursor.getString(columnIndex));
-                Log.d(TAG, "---------------------------------------------");
-                */
-                ids.add(cursor.getString(columnIndex));
-
-                i++;
-            }
-            cursor.close();
-            Log.d(TAG, "count = " + Integer.toString(count));
-
-        }
-
-        return ids;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
