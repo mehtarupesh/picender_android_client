@@ -1,5 +1,6 @@
 package com.grafixartist.gallery;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -24,6 +25,7 @@ public class DirectoryActivity extends AppCompatActivity {
     GalleryAdapter mAdapter;
     RecyclerView mRecyclerView;
 
+    String dirName;
     ArrayList<ImageModel> data = new ArrayList<>();
     String TAG = "DirectoryActivity";
 
@@ -35,6 +37,7 @@ public class DirectoryActivity extends AppCompatActivity {
 
         Album album = (Album) getIntent().getParcelableExtra(Album.PAR_KEY);
         ArrayList<String> ids = album.getUriData();
+        dirName = album.getName();
 
         for (int i = 0; i < ids.size(); i++) {
 
@@ -62,18 +65,34 @@ public class DirectoryActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(View view, int position) {
 
-                        Intent intent = new Intent(DirectoryActivity.this, DetailActivity.class);
-                        intent.putParcelableArrayListExtra("data", data);
-                        intent.putExtra("pos", position);
-                        startActivity(intent);
-
+                        Selector s = Selector.getInstance(data.size(), false);
+                        ImageView mImg = (ImageView) view.findViewById(R.id.item_img);
+                        /* if selected, deselect */
+                        if(s.getState(position) == true) {
+                            mImg.clearColorFilter();
+                            s.toggle(position);
+                        } else {
+                            Intent intent = new Intent(DirectoryActivity.this, DetailActivity.class);
+                            intent.putParcelableArrayListExtra("data", data);
+                            intent.putExtra("pos", position);
+                            startActivity(intent);
+                        }
                     }
 
                     @Override
                     public void onItemLongClick(View view, int position) {
 
-                        ImageView mImg = (ImageView)view.findViewById(R.id.item_img);
-                        mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
+                        Selector s = Selector.getInstance(data.size(), false);
+                        ImageView mImg = (ImageView) view.findViewById(R.id.item_img);
+
+                        /* toggle state */
+                        if(s.getState(position) == false) {
+                            mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
+                        }else
+                            mImg.clearColorFilter();
+
+                        s.toggle(position);
+
                     }
                 }));
     }
@@ -85,6 +104,20 @@ public class DirectoryActivity extends AppCompatActivity {
 
     @Override
     public void onStop() {
+
+        /* reset selector */
+        Selector s = Selector.getInstance(data.size(), false);
+        ArrayList<Integer> l = s.getList(true);
+
+        GridLayoutManager layoutManager = ((GridLayoutManager)mRecyclerView.getLayoutManager());
+        for(int i = 0; i <l.size(); i++) {
+            View childView = layoutManager.getChildAt(l.get(i));
+            ImageView mImg = null;
+            if (childView != null) mImg = (ImageView) childView.findViewById(R.id.item_img);
+            if (mImg != null) mImg.clearColorFilter();
+        }
+        Selector.destroyInstance();
+
         super.onStop();
     }
 

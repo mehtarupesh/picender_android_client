@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     Context context;
     List<ImageModel> data = new ArrayList<>();
+    String TAG = "GalleryAdapter";
 
     public GalleryAdapter(Context context, List<ImageModel> data) {
         this.context = context;
@@ -45,13 +47,18 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             Glide.with(context).load(data.get(position).getUrl())
                     .thumbnail(0.5f)
-                    .override(200,200)
+                    .override(200, 200)
                     .crossFade()
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .dontAnimate() /* to avoid getting pics washed out */
                     .into(((MyItemHolder) holder).mImg);
 
-            ((MyItemHolder)holder).mImg.clearColorFilter(); /* to avoid mass pic corruption */
+            /* refresh image */
+            Selector s = Selector.getInstance(data.size(), false);
+            if(s.getState(position) == true)
+                ((MyItemHolder)holder).mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
+            else
+                ((MyItemHolder)holder).mImg.clearColorFilter(); /* to avoid mass pic corruption */
     }
 
     @Override
