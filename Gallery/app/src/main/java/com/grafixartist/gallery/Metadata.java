@@ -21,31 +21,34 @@ import javax.crypto.spec.SecretKeySpec;
 */
 public class Metadata {
 
-    private String fname;
-    private int size;
+    private String fid;
+    private String fdir;
+    private int fsize;
     private String SHARED_KEY = "cigital/ds/12@33!";
     private String DELIMITER = "@@##$$^^";
     public static int HEADER_SIZE = 512;
+    private String DIR_STRING = "DIR";
     private String ID_STRING = "ID";
     private String LEN_STRING = "LENGTH";
     private String TAG = "Metadata";
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
-    Metadata(String fname, int size) {
+    Metadata(String fdirName, String fname, int size) {
 
-        this.fname = fname;
-        this.size = size;
+        this.fdir = fdirName;
+        this.fid = fname;
+        this.fsize = size;
         //create fprop object
     }
 
     String gen_header_string() {
 
         JSONObject jobj = new JSONObject();
-        String dummyPath = fname;
-        int dummySize = size;
+
         try {
-            jobj.put(ID_STRING, dummyPath);
-            jobj.put(LEN_STRING, Integer.toString(dummySize));
+            jobj.put(DIR_STRING, fdir);
+            jobj.put(ID_STRING, fid);
+            jobj.put(LEN_STRING, Integer.toString(fsize));
             Log.d(TAG, jobj.toString());
         } catch (JSONException ex) {
             ex.printStackTrace();

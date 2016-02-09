@@ -22,10 +22,12 @@ public class Sender extends AsyncTask<Void, Void, Void> {
     private int PORT = 8888;
     private int RECV_BUFLEN = 4096;
     private String filePath = null;
+    private String fileDir = null;
     private String TAG = "Sender";
 
-    Sender(String absFilePath) {
+    Sender(String fileDirName, String absFilePath) {
         this.filePath = absFilePath;
+        this.fileDir = fileDirName;
     }
 
     @Override
@@ -44,7 +46,7 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             int total_bytes = 0;
 
             /* send metadata */
-            Metadata m = new Metadata(filePath, (int)target.length());
+            Metadata m = new Metadata(fileDir, filePath, (int)target.length());
             String fheader = null;
             try {
                 fheader = m.crypt();

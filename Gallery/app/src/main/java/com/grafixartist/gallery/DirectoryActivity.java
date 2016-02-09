@@ -167,7 +167,7 @@ public class DirectoryActivity extends AppCompatActivity {
 
             for(int i=0; i < l.size(); i++) {
                 int index = l.get(i);
-                Sender S = new Sender(data.get(index).getUrl());
+                Sender S = new Sender(dirName, data.get(index).getUrl());
                 S.execute();
             }
 
