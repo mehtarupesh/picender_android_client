@@ -34,7 +34,6 @@ public class DirectoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_directory);
 
-
         Album album = (Album) getIntent().getParcelableExtra(Album.PAR_KEY);
         ArrayList<String> ids = album.getUriData();
         dirName = album.getName();
@@ -55,7 +54,6 @@ public class DirectoryActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         mRecyclerView.setHasFixedSize(true);
 
-
         mAdapter = new GalleryAdapter(DirectoryActivity.this, data);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -67,7 +65,8 @@ public class DirectoryActivity extends AppCompatActivity {
 
                         Selector s = Selector.getInstance(data.size(), false);
                         ImageView mImg = (ImageView) view.findViewById(R.id.item_img);
-                        /* if selected, deselect */
+
+                        /* if selected, then deselect else show image in full size */
                         if(s.getState(position) == true) {
                             mImg.clearColorFilter();
                             s.toggle(position);
@@ -107,8 +106,7 @@ public class DirectoryActivity extends AppCompatActivity {
     @Override
     public void onStop() {
 
-        Log.d(TAG, "onStop");
-        /* reset selector */
+        /* reset selector, clean up */
         Selector s = Selector.getInstance(data.size(), false);
         ArrayList<Integer> l = s.getList(true);
 
@@ -116,8 +114,12 @@ public class DirectoryActivity extends AppCompatActivity {
         for(int i = 0; i <l.size(); i++) {
             View childView = layoutManager.getChildAt(l.get(i));
             ImageView mImg = null;
-            if (childView != null) mImg = (ImageView) childView.findViewById(R.id.item_img);
-            if (mImg != null) mImg.clearColorFilter();
+
+            if (childView != null)
+                mImg = (ImageView) childView.findViewById(R.id.item_img);
+
+            if (mImg != null)
+                mImg.clearColorFilter();
         }
         Selector.destroyInstance();
 
@@ -141,32 +143,36 @@ public class DirectoryActivity extends AppCompatActivity {
         if (id == R.id.action_selectall) {
 
             Selector s = Selector.getInstance(data.size(), false);
-
             GridLayoutManager layoutManager = ((GridLayoutManager)mRecyclerView.getLayoutManager());
+
             for(int i = 0; i <data.size(); i++) {
                 View childView = layoutManager.getChildAt(i);
                 ImageView mImg = null;
-                if (childView != null) mImg = (ImageView) childView.findViewById(R.id.item_img);
-                if (mImg != null) mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
+
+                if (childView != null)
+                    mImg = (ImageView) childView.findViewById(R.id.item_img);
+
+                if (mImg != null)
+                    mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
 
                 s.setState(i, true);
             }
+
             return true;
 
         }else if (id == R.id.action_upload) {
+
             Selector s = Selector.getInstance(data.size(), false);
             ArrayList<Integer> l = s.getList(true);
 
-            Log.d(TAG, "Sending...");
             for(int i=0; i < l.size(); i++) {
-
                 int index = l.get(i);
-
-                Log.d(TAG, data.get(index).getUrl());
-                Log.d(TAG, "------------------------");
+                Sender S = new Sender(data.get(index).getUrl());
+                S.execute();
             }
 
             return true;
+
         } else if (id == R.id.action_delete) {
             return true;
         }
