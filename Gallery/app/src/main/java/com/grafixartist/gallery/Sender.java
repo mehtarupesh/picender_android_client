@@ -18,7 +18,7 @@ import java.net.UnknownHostException;
 public class Sender extends AsyncTask<Void, Void, Void> {
 
     private Socket client;
-    private String SERVER = "192.168.1.6";
+    private String SERVER = "armeta.ddns.net";
     private int PORT = 8888;
     private int RECV_BUFLEN = 4096;
     private String filePath = null;
