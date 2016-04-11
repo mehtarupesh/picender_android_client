@@ -37,11 +37,23 @@ public class DirectoryActivity extends AppCompatActivity {
         Album album = (Album) getIntent().getParcelableExtra(Album.PAR_KEY);
         ArrayList<String> ids = album.getUriData();
         dirName = album.getName();
+        int n_images = ids.size();
 
-        for (int i = 0; i < ids.size(); i++) {
+        /* HACK!!: reverse the list while adding data
+        * Ideally, the list passed from the parent intent should
+        * contain information based on which we can sort the images (in this case
+        * for example: DATE_ADDED/DATE_TAKEN
+        * I am too lazy to do that for *now*, so assuming the list is in
+        * ascending order of time and simply reversing it should provide the intended result of
+        * this exercise:
+        *
+        * 'SHOW LATEST IMAGES ADDED FIRST'
+        *
+        *  */
+        for (int i = n_images - 1; i >= 0; i--) {
 
             ImageModel imageModel = new ImageModel();
-            imageModel.setName("Image " + i);
+            imageModel.setName("Image " + Integer.toString(n_images - i));
             imageModel.setUrl(ids.get(i));
             data.add(imageModel);
 

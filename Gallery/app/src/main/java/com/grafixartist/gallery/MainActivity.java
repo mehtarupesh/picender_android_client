@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<Album> getAlbumList(){
 
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        String[] projection = { MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.DATA };
+        String[] projection = { MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.DATA, MediaStore.Images.Media.DATE_ADDED };
 
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
 
@@ -78,11 +78,13 @@ public class MainActivity extends AppCompatActivity {
         if (cursor != null) {
             int dirColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
             int dataColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+            int dateColumnIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATE_ADDED);
 
             while (cursor.moveToNext()) {
 
                 String albumName = cursor.getString(dirColumnIndex);
                 String uriData = cursor.getString(dataColumnIndex);
+                Long dateData = cursor.getLong(dateColumnIndex);
 
                 if(hmap.containsKey(albumName)) {
 
@@ -98,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //Log.d(TAG, "DIR -------> " + cursor.getString(dirColumnIndex));
                 //Log.d(TAG, "DATA -------> " + cursor.getString(dataColumnIndex));
+                //Log.d(TAG, "DATE ADDED -------> " + cursor.getLong(dateColumnIndex));
 
                 //Log.d(TAG, "---------------------------------------------");
 
