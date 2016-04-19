@@ -68,6 +68,9 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             out.close();
             client.close();
 
+            /* mark file as sent */
+            m.store();
+
         } catch(UnknownHostException e) {
 
             Log.d(TAG, "Unkown HOST : " + SERVER);

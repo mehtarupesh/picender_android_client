@@ -49,7 +49,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .thumbnail(0.5f)
                     .override(200, 200)
                     .crossFade()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT) /* cache only the transformed image */
                     .dontAnimate() /* to avoid getting pics washed out */
                     .into(((MyItemHolder) holder).mImg);
 
