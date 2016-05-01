@@ -130,10 +130,10 @@ public class DirectoryActivity extends AppCompatActivity {
     }
 
 
-    public void callBroadCast() {
+    public void callBroadCast(String url) {
         if (Build.VERSION.SDK_INT >= 14) {
             Log.d("-->", " >= 14");
-            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            MediaScannerConnection.scanFile(this, new String[]{url}, null, new MediaScannerConnection.OnScanCompletedListener() {
                 /*
                  *   (non-Javadoc)
                  * @see android.media.MediaScannerConnection.OnScanCompletedListener#onScanCompleted(java.lang.String, android.net.Uri)
@@ -161,8 +161,8 @@ public class DirectoryActivity extends AppCompatActivity {
 
             if (Metadata.loadCacheInfo(data.get(index).getUrl()) != null) {
 
-                    Metadata.delete(data.get(index).getUrl());
-                    callBroadCast();
+                Metadata.delete(data.get(index).getUrl());
+                callBroadCast(data.get(index).getUrl());
 
             } else {
                 Log.d(TAG, "onDestroy INVALID STATE !!");

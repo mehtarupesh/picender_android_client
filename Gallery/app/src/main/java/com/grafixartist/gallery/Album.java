@@ -45,6 +45,10 @@ public class Album implements Parcelable {
         this.uriData = uriData;
     }
 
+    public int getAlbumSize() {
+        return uriData.size();
+    }
+
     public int describeContents() {
         return 0;
     }

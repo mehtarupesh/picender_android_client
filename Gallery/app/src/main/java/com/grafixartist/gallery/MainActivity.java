@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         final ArrayList<String> dirNames = new ArrayList<String>();
 
         for(int i = 0; i < albumList.size(); i++)
-            dirNames.add(albumList.get(i).getName());
+            dirNames.add(albumList.get(i).getName() + " (" + Integer.toString(albumList.get(i).getAlbumSize()) + ")");
 
         dirView = (ListView)findViewById(R.id.listView);
 
