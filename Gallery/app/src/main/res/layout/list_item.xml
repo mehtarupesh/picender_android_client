@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--    list_item.xml   -->
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_img_rl"
+    android:layout_width="match_parent"
+    android:layout_height="128dp"
+    android:layout_margin="1dp"
+    android:adjustViewBounds="true"
+    android:scaleType="centerCrop"
+    >
+<ImageView
     android:id="@+id/item_img"
     android:layout_width="match_parent"
     android:layout_height="128dp"
@@ -8,3 +17,11 @@
     android:adjustViewBounds="true"
     android:scaleType="centerCrop" />
 
+<ImageView android:id="@+id/item_img_state"
+    android:scaleType="fitXY"
+    android:layout_width="26dp"
+    android:layout_height="26dp"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentRight="true"
+    />
+</RelativeLayout>

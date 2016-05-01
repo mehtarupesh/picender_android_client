@@ -23,11 +23,13 @@ public class Sender extends AsyncTask<Void, Void, Void> {
     private int RECV_BUFLEN = 4096;
     private String filePath = null;
     private String fileDir = null;
+    private int position;
     private String TAG = "Sender";
 
-    Sender(String fileDirName, String absFilePath) {
+    Sender(String fileDirName, String absFilePath, int position) {
         this.filePath = absFilePath;
         this.fileDir = fileDirName;
+        this.position = position;
     }
 
     @Override
@@ -36,7 +38,11 @@ public class Sender extends AsyncTask<Void, Void, Void> {
         File target = new File(filePath);
         OutputStream out;
 
-        try{
+        if (Metadata.loadCacheInfo(filePath) != null) {
+            Log.d(TAG, " >>> " + filePath + " <<< already Exists !!");
+            return null;
+        }
+        try {
 
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(target));
             client = new Socket(SERVER, PORT);
@@ -46,7 +52,7 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             int total_bytes = 0;
 
             /* send metadata */
-            Metadata m = new Metadata(fileDir, filePath, (int)target.length());
+            Metadata m = new Metadata(fileDir, filePath, (int) target.length());
             String fheader = null;
             try {
                 fheader = m.crypt();
@@ -57,7 +63,7 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             out.write(fheader.getBytes(), 0, Metadata.HEADER_SIZE);
 
             /*send file in chunks */
-            while((recd_bytes = in.read(buffer, 0, RECV_BUFLEN)) != -1) {
+            while ((recd_bytes = in.read(buffer, 0, RECV_BUFLEN)) != -1) {
 
                 out.write(buffer, 0, recd_bytes);
                 total_bytes += recd_bytes;
@@ -71,17 +77,26 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             /* mark file as sent */
             m.store();
 
-        } catch(UnknownHostException e) {
+        } catch (UnknownHostException e) {
 
             Log.d(TAG, "Unkown HOST : " + SERVER);
             e.printStackTrace();
 
-        } catch(IOException e) {
+        } catch (IOException e) {
 
-            Log.d(TAG, "IOException for file: "+filePath);
+            Log.d(TAG, "IOException for file: " + filePath);
             e.printStackTrace();
         }
 
+        Log.d(TAG, "Done sending image !!");
         return null;
     }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        Log.d(TAG, "Marking Image");
+        //GalleryAdapter.markImage(this.position);
+    }
+
 }

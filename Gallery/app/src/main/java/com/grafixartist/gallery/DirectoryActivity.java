@@ -39,7 +39,7 @@ public class DirectoryActivity extends AppCompatActivity {
         dirName = album.getName();
         int n_images = ids.size();
 
-        /* HACK!!: reverse the list while adding data
+        /* Reverse the list while adding data
         * Ideally, the list passed from the parent intent should
         * contain information based on which we can sort the images (in this case
         * for example: DATE_ADDED/DATE_TAKEN
@@ -47,7 +47,7 @@ public class DirectoryActivity extends AppCompatActivity {
         * ascending order of time and simply reversing it should provide the intended result of
         * this exercise:
         *
-        * 'SHOW LATEST IMAGES ADDED FIRST'
+        * 'SHOW LATEST IMAGES FIRST'
         *
         *  */
         for (int i = n_images - 1; i >= 0; i--) {
@@ -75,13 +75,13 @@ public class DirectoryActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(View view, int position) {
 
-                        Selector s = Selector.getInstance(data.size(), false);
+                        Selector s = Selector.getInstance(data.size());
                         ImageView mImg = (ImageView) view.findViewById(R.id.item_img);
 
                         /* if selected, then deselect else show image in full size */
-                        if(s.getState(position) == true) {
+                        if(s.getSelectedState(position) == true) {
                             mImg.clearColorFilter();
-                            s.toggle(position);
+                            s.toggleSelectedState(position);
                         } else {
                             Intent intent = new Intent(DirectoryActivity.this, DetailActivity.class);
                             intent.putParcelableArrayListExtra("data", data);
@@ -93,16 +93,16 @@ public class DirectoryActivity extends AppCompatActivity {
                     @Override
                     public void onItemLongClick(View view, int position) {
 
-                        Selector s = Selector.getInstance(data.size(), false);
+                        Selector s = Selector.getInstance(data.size());
                         ImageView mImg = (ImageView) view.findViewById(R.id.item_img);
 
                         /* toggle state */
-                        if(s.getState(position) == false) {
+                        if(s.getSelectedState(position) == false) {
                             mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
                         }else
                             mImg.clearColorFilter();
 
-                        s.toggle(position);
+                        s.toggleSelectedState(position);
 
                     }
                 }));
@@ -118,9 +118,10 @@ public class DirectoryActivity extends AppCompatActivity {
     @Override
     public void onStop() {
 
+        /* TODO: Do this in GalleryAdapter */
         /* reset selector, clean up */
-        Selector s = Selector.getInstance(data.size(), false);
-        ArrayList<Integer> l = s.getList(true);
+        Selector s = Selector.getInstance(data.size());
+        ArrayList<Integer> l = s.getSelectedStateList(true);
 
         GridLayoutManager layoutManager = ((GridLayoutManager)mRecyclerView.getLayoutManager());
         for(int i = 0; i <l.size(); i++) {
@@ -151,10 +152,11 @@ public class DirectoryActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        Selector s = Selector.getInstance(data.size());
 
+        /* TODO: DO this in GalleryAdapter */
         if (id == R.id.action_selectall) {
 
-            Selector s = Selector.getInstance(data.size(), false);
             GridLayoutManager layoutManager = ((GridLayoutManager)mRecyclerView.getLayoutManager());
 
             for(int i = 0; i <data.size(); i++) {
@@ -167,19 +169,18 @@ public class DirectoryActivity extends AppCompatActivity {
                 if (mImg != null)
                     mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
 
-                s.setState(i, true);
+                s.setSelectedState(i, true);
             }
 
             return true;
 
         }else if (id == R.id.action_upload) {
 
-            Selector s = Selector.getInstance(data.size(), false);
-            ArrayList<Integer> l = s.getList(true);
+            ArrayList<Integer> l = s.getSelectedStateList(true);
 
             for(int i=0; i < l.size(); i++) {
                 int index = l.get(i);
-                Sender S = new Sender(dirName, data.get(index).getUrl());
+                Sender S = new Sender(dirName, data.get(index).getUrl(), index);
                 S.execute();
             }
 

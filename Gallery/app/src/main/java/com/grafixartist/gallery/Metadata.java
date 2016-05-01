@@ -34,7 +34,7 @@ public class Metadata {
     private String TAG = "Metadata";
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
-    private String metaId = ".meta";
+    private static String metaId = ".meta";
 
     Metadata(String fdirName, String fname, int size) {
 
@@ -112,23 +112,49 @@ public class Metadata {
 
     }
 
-    public boolean store() {
+    private static String generateCacheDirPath(String fid) {
 
         /* store metadata info in <path_to_image_dir>/.meta/fname.meta */
-        File target = new File(this.fid);
+        File target = new File(fid);
+
+        if(target == null)
+            return null;
+
         String fDirPath = target.getParent();
 
         /* generate cache dir path */
-        String cDirPath = fDirPath + "/" + this.metaId + "/";
+        String cDirPath = fDirPath + "/" + Metadata.metaId + "/";
+
+        return cDirPath;
+    }
+
+    private static String generateCacheFilePath(String fid) {
+        /* store metadata info in <path_to_image_dir>/.meta/fname.meta */
+        File target = new File(fid);
+
+        if(target == null)
+            return null;
+
+        String cDirPath = generateCacheDirPath(fid);
+
+         /* generate cache file path */
+        String cFilename = target.getName() + Metadata.metaId;
+        String cFilePath = cDirPath + cFilename;
+
+        return cFilePath;
+
+    }
+    public boolean store() {
+
+        /* generate cache dir path */
+        String cDirPath = generateCacheDirPath(this.fid);
         File cDir = new File(cDirPath);
 
         if(!cDir.exists()) {
             cDir.mkdirs();
         }
 
-        /* generate cache file path */
-        String cFilename = target.getName() + this.metaId;
-        String cFilePath = cDirPath + cFilename;
+        String cFilePath = generateCacheFilePath(this.fid);
 
         //Log.d(TAG, "fdirPath" + fDirPath);
         //Log.d(TAG, "cdir = " + cDirPath);
@@ -153,4 +179,20 @@ public class Metadata {
         return true;
     }
 
+    public static String loadCacheInfo(String uri) {
+
+        String cFilePath = generateCacheFilePath(uri);
+
+        File cFile = new File(cFilePath);
+
+        if (cFile.exists())
+            return cFilePath;
+        else
+            return null;
+
+    }
+
+    public static void listAllFiles(String uri) {
+
+    }
 }
