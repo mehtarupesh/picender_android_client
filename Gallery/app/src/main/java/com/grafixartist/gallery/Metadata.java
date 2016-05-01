@@ -1,5 +1,6 @@
 package com.grafixartist.gallery;
 
+import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Xml;
@@ -31,7 +32,7 @@ public class Metadata {
     private String DIR_STRING = "DIR";
     private String ID_STRING = "ID";
     private String LEN_STRING = "LENGTH";
-    private String TAG = "Metadata";
+    private static String TAG = "Metadata";
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
     private static String metaId = ".meta";
@@ -192,7 +193,20 @@ public class Metadata {
 
     }
 
-    public static void listAllFiles(String uri) {
+    public static Boolean delete(String uri) {
+        File dFile = new File(uri);
 
+        if (dFile.exists()) {
+            if (dFile.delete()) {
+                Log.d(TAG, "file deleted : " + uri);
+                return true;
+            } else {
+                Log.d(TAG, "file NOT deleted : " + uri);
+            }
+        } else {
+            Log.d(TAG, "file does not exist : " + uri);
+        }
+
+        return false;
     }
 }

@@ -88,15 +88,13 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             e.printStackTrace();
         }
 
-        Log.d(TAG, "Done sending image !!");
         return null;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        Log.d(TAG, "Marking Image");
-        //GalleryAdapter.markImage(this.position);
+        GalleryAdapter.markImage(this.position);
     }
 
 }

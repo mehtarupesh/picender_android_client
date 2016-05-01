@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -18,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class DirectoryActivity extends AppCompatActivity {
@@ -56,7 +60,13 @@ public class DirectoryActivity extends AppCompatActivity {
             imageModel.setName("Image " + Integer.toString(n_images - i));
             imageModel.setUrl(ids.get(i));
             data.add(imageModel);
+        }
 
+        Selector s = Selector.getInstance(data.size());
+        for (int i = 0; i < data.size(); i++) {
+            if(Metadata.loadCacheInfo(data.get(i).getUrl()) != null) {
+                s.setOnCloudState(i, true);
+            }
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -76,12 +86,14 @@ public class DirectoryActivity extends AppCompatActivity {
                     public void onItemClick(View view, int position) {
 
                         Selector s = Selector.getInstance(data.size());
-                        ImageView mImg = (ImageView) view.findViewById(R.id.item_img);
+
+                        if (s.getMarkForDeletion(position) == true)
+                            return;
 
                         /* if selected, then deselect else show image in full size */
                         if(s.getSelectedState(position) == true) {
-                            mImg.clearColorFilter();
                             s.toggleSelectedState(position);
+                            GalleryAdapter.refreshImage(position);
                         } else {
                             Intent intent = new Intent(DirectoryActivity.this, DetailActivity.class);
                             intent.putParcelableArrayListExtra("data", data);
@@ -94,49 +106,70 @@ public class DirectoryActivity extends AppCompatActivity {
                     public void onItemLongClick(View view, int position) {
 
                         Selector s = Selector.getInstance(data.size());
+
+                        if (s.getMarkForDeletion(position) == true)
+                            return;
+
                         ImageView mImg = (ImageView) view.findViewById(R.id.item_img);
-
-                        /* toggle state */
-                        if(s.getSelectedState(position) == false) {
-                            mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
-                        }else
-                            mImg.clearColorFilter();
-
                         s.toggleSelectedState(position);
-
+                        GalleryAdapter.refreshImage(position);
                     }
                 }));
     }
 
     @Override
     public void onStart() {
-
         Log.d(TAG, "onStart");
         super.onStart();
     }
 
     @Override
     public void onStop() {
+        Log.d(TAG, "onStop");
+        super.onStop();
+    }
 
-        /* TODO: Do this in GalleryAdapter */
-        /* reset selector, clean up */
+
+    public void callBroadCast() {
+        if (Build.VERSION.SDK_INT >= 14) {
+            Log.d("-->", " >= 14");
+            MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+                /*
+                 *   (non-Javadoc)
+                 * @see android.media.MediaScannerConnection.OnScanCompletedListener#onScanCompleted(java.lang.String, android.net.Uri)
+                 */
+                public void onScanCompleted(String path, Uri uri) {
+                    Log.d("ExternalStorage", "Scanned " + path + ":");
+                    Log.d("ExternalStorage", "-> uri=" + uri);
+                }
+            });
+        } else {
+            Log.d("-->", " < 14");
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
+                    Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+        }
+    }
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
+
         Selector s = Selector.getInstance(data.size());
-        ArrayList<Integer> l = s.getSelectedStateList(true);
 
-        GridLayoutManager layoutManager = ((GridLayoutManager)mRecyclerView.getLayoutManager());
-        for(int i = 0; i <l.size(); i++) {
-            View childView = layoutManager.getChildAt(l.get(i));
-            ImageView mImg = null;
+        ArrayList<Integer> l = s.getMarkForDeletionList(true);
+        for(int i=0; i < l.size(); i++) {
+            int index = l.get(i);
 
-            if (childView != null)
-                mImg = (ImageView) childView.findViewById(R.id.item_img);
+            if (Metadata.loadCacheInfo(data.get(index).getUrl()) != null) {
 
-            if (mImg != null)
-                mImg.clearColorFilter();
+                    Metadata.delete(data.get(index).getUrl());
+                    callBroadCast();
+
+            } else {
+                Log.d(TAG, "onDestroy INVALID STATE !!");
+            }
         }
         Selector.destroyInstance();
-
-        super.onStop();
+        super.onDestroy();
     }
 
     @Override
@@ -154,22 +187,15 @@ public class DirectoryActivity extends AppCompatActivity {
         int id = item.getItemId();
         Selector s = Selector.getInstance(data.size());
 
-        /* TODO: DO this in GalleryAdapter */
         if (id == R.id.action_selectall) {
 
-            GridLayoutManager layoutManager = ((GridLayoutManager)mRecyclerView.getLayoutManager());
-
             for(int i = 0; i <data.size(); i++) {
-                View childView = layoutManager.getChildAt(i);
-                ImageView mImg = null;
 
-                if (childView != null)
-                    mImg = (ImageView) childView.findViewById(R.id.item_img);
-
-                if (mImg != null)
-                    mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
+                if (s.getMarkForDeletion(i) == true)
+                    continue;
 
                 s.setSelectedState(i, true);
+                GalleryAdapter.refreshImage(i);
             }
 
             return true;
@@ -180,6 +206,8 @@ public class DirectoryActivity extends AppCompatActivity {
 
             for(int i=0; i < l.size(); i++) {
                 int index = l.get(i);
+
+                s.toggleSelectedState(index);
                 Sender S = new Sender(dirName, data.get(index).getUrl(), index);
                 S.execute();
             }
@@ -187,6 +215,22 @@ public class DirectoryActivity extends AppCompatActivity {
             return true;
 
         } else if (id == R.id.action_delete) {
+
+            ArrayList<Integer> l = s.getSelectedStateList(true);
+
+            for(int i=0; i < l.size(); i++) {
+                int index = l.get(i);
+
+                s.toggleSelectedState(index);
+                s.setMarkForDeletion(index, true);
+
+                if (s.getOnCloudState(index) == false) {
+                    Sender S = new Sender(dirName, data.get(index).getUrl(), index);
+                    S.execute();
+                } else {
+                    GalleryAdapter.refreshImage(index);
+                }
+            }
             return true;
         }
 

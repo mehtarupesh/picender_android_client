@@ -43,8 +43,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     R.layout.list_item, parent, false);
             viewHolder = new MyItemHolder(v);
 
-        Log.d(TAG, "OnCreateViewholder : viewtype = " + Integer.toString(viewType));
-
         return viewHolder;
     }
 
@@ -59,23 +57,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .dontAnimate() /* to avoid getting pics washed out */
                     .into(((MyItemHolder) holder).mImg);
 
-            /* refresh image */
-            Selector s = Selector.getInstance(data.size());
-            if(s.getSelectedState(position) == true) {
-                ((MyItemHolder) holder).mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
-                //((MyItemHolder) holder).mImg_state.setVisibility(View.VISIBLE);
-                //((MyItemHolder) holder).mImg_state.setImageResource(R.drawable.tick);
+        imgList[position] = (MyItemHolder)holder;
+        refreshImage(position);
 
-            } else {
-                ((MyItemHolder) holder).mImg.clearColorFilter(); /* to avoid mass pic corruption */
-                //((MyItemHolder) holder).mImg_state.setVisibility(View.INVISIBLE);
-            }
-
-        if (imgList[position] == null) {
-            Log.d(TAG, "OnBindViewholder : url = " + data.get(position).getUrl());
-            Log.d(TAG, "OnBindViewholder : position = " + Integer.toString(position));
-            imgList[position] = (MyItemHolder)holder;
-        }
 
     }
 
@@ -99,13 +83,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public static void markImage(int position) {
 
-        MyItemHolder i = imgList[position];
-
-        if (i != null) {
-            i.mImg_state.setVisibility(View.VISIBLE);
-            i.mImg_state.setImageResource(R.drawable.tick);
-        }else
-            Log.d(TAG, "NULL imgList pos = " + Integer.toString(position));
+        Selector s = Selector.getInstance(imgList.length);
+        s.setOnCloudState(position, true);
+        refreshImage(position);
     }
 
     public static void refreshImage(int position) {
@@ -118,10 +98,32 @@ public class GalleryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         Selector s = Selector.getInstance(imgList.length);
         MyItemHolder i = imgList[position];
 
+        if(i == null) {
+            Log.d(TAG, "refreshImage null image !!");
+            return;
+        }
+
+
+        if(s.getOnCloudState(position) == true) {
+            i.mImg_state.setVisibility(View.VISIBLE);
+            i.mImg_state.setImageResource(R.drawable.tick);
+        } else {
+            i.mImg_state.setVisibility(View.INVISIBLE);
+        }
+
+        if (s.getMarkForDeletion(position) == true) {
+            i.mImg.setColorFilter(Color.RED, PorterDuff.Mode.LIGHTEN);
+            //i.mImg_state.setColorFilter(Color.RED, PorterDuff.Mode.LIGHTEN);
+            return;
+        }
+
         if (s.getSelectedState(position) == true) {
             i.mImg.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
-        } else
+            //i.mImg_state.setColorFilter(Color.BLUE, PorterDuff.Mode.LIGHTEN);
+        } else {
             i.mImg.clearColorFilter(); /* to avoid mass pic corruption */
+            //i.mImg_state.clearColorFilter();
+        }
 
     }
 }

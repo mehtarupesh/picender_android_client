@@ -103,4 +103,58 @@ public class Selector {
 
         return indexList;
     }
+
+    /* operations on onCloud State */
+    public void setOnCloudState(int index, Boolean val) {
+
+        if(!validIndex(index))
+            return;
+
+        FileState s = dataState.get(index);
+        s.setOnCloud(val);
+        dataState.set(index, s);
+    }
+
+    public Boolean getOnCloudState(int index) {
+
+        if(!validIndex(index))
+            return false;
+
+        FileState s = dataState.get(index);
+        return s.getOnCloud();
+    }
+
+    /* operations on markForDeletion */
+    public void setMarkForDeletion(int index, Boolean val) {
+
+        if(!validIndex(index))
+            return;
+
+        FileState s = dataState.get(index);
+        s.setMarkForDeletion(val);
+        dataState.set(index, s);
+    }
+
+    public Boolean getMarkForDeletion(int index) {
+
+        if(!validIndex(index))
+            return false;
+
+        FileState s = dataState.get(index);
+        return s.getMarkForDeletion();
+    }
+
+    public ArrayList<Integer> getMarkForDeletionList(Boolean val) {
+
+        ArrayList<Integer> indexList = new ArrayList<Integer>();
+
+        for(int i = 0; i < dataState.size(); i++) {
+
+            FileState s = dataState.get(i);
+            if(s.getMarkForDeletion() == val)
+                indexList.add(i);
+        }
+
+        return indexList;
+    }
 }
