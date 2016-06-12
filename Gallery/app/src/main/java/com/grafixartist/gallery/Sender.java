@@ -21,6 +21,7 @@ public class Sender extends AsyncTask<Void, Void, Void> {
     private String SERVER = "armeta.ddns.net";
     private int PORT = 8888;
     private int RECV_BUFLEN = 4096;
+    private int DATA_BUFLEN = (16 * 4096);
     private String filePath = null;
     private String fileDir = null;
     private int position;
@@ -47,7 +48,7 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(target));
             client = new Socket(SERVER, PORT);
             out = client.getOutputStream();
-            byte[] buffer = new byte[RECV_BUFLEN];
+            byte[] buffer = new byte[DATA_BUFLEN];
             int recd_bytes = 0;
             int total_bytes = 0;
 
@@ -63,7 +64,7 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             out.write(fheader.getBytes(), 0, Metadata.HEADER_SIZE);
 
             /*send file in chunks */
-            while ((recd_bytes = in.read(buffer, 0, RECV_BUFLEN)) != -1) {
+            while ((recd_bytes = in.read(buffer, 0, DATA_BUFLEN)) != -1) {
 
                 out.write(buffer, 0, recd_bytes);
                 total_bytes += recd_bytes;
@@ -76,6 +77,9 @@ public class Sender extends AsyncTask<Void, Void, Void> {
 
             /* mark file as sent */
             m.store();
+
+            /* test compression */
+            //m.compress();
 
         } catch (UnknownHostException e) {
 
