@@ -1,5 +1,7 @@
 package com.grafixartist.gallery;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
@@ -8,9 +10,19 @@ import android.util.Xml;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -26,7 +38,7 @@ public class Metadata {
     private String fid;
     private String fdir;
     private int fsize;
-    private String SHARED_KEY = "cigital/ds/12@33!";
+    private String SHARED_KEY = "~9)*4:r!61!2@S@NT0M&5";
     private String DELIMITER = "@@##$$^^";
     public static int HEADER_SIZE = 512;
     private String DIR_STRING = "DIR";
@@ -208,5 +220,91 @@ public class Metadata {
         }
 
         return false;
+    }
+
+    public static byte[] compressData(byte[] bytesToCompress)
+    {
+        Deflater deflater = new Deflater();
+        deflater.setInput(bytesToCompress);
+        deflater.finish();
+
+        byte[] bytesCompressed = new byte[32 * 4096];
+
+        int numberOfBytesAfterCompression = deflater.deflate(bytesCompressed);
+
+        byte[] returnValues = new byte[numberOfBytesAfterCompression];
+
+        System.arraycopy
+                (
+                        bytesCompressed,
+                        0,
+                        returnValues,
+                        0,
+                        numberOfBytesAfterCompression
+                );
+
+        return returnValues;
+    }
+
+    public byte[] decompressData(byte[] compressedData) throws IOException, DataFormatException
+    {
+        Inflater inflater = new Inflater();
+        inflater.setInput(compressedData, 0, compressedData.length);
+        byte[] decompressedBytes = new byte[32 * 4096];
+        int decompressedByteCount = inflater.inflate(decompressedBytes);
+        byte[] retval = new byte[decompressedByteCount];
+
+        System.arraycopy(decompressedBytes, 0, retval, 0, decompressedByteCount);
+
+        return retval;
+
+    }
+
+    public void compressionTest() {
+
+        Log.d(TAG, "Starting compression");
+
+        String compressed_fid = this.fid + ".compressed";
+        File compressed = new File(compressed_fid);
+        File orig = new File(this.fid);
+
+        try {
+
+            int recd_bytes, total_bytes = 0;
+            int DATA_BUFLEN = (16 * 4096);
+            byte[] buffer = new byte[DATA_BUFLEN];
+
+            BufferedInputStream in = new BufferedInputStream(new FileInputStream(orig));
+            FileOutputStream out = new FileOutputStream(compressed);
+
+            /*send file in chunks */
+            long start = System.currentTimeMillis();
+            while ((recd_bytes = in.read(buffer, 0, DATA_BUFLEN)) != -1) {
+
+                byte[] recd = compressData(buffer);
+
+                /*
+                byte[] decompressed = decompressData(recd);
+
+                for (int i = 0; i < recd_bytes; i++) {
+                    if (buffer[i] != decompressed[i]) {
+                        Log.d(TAG, "buffer size =" + Integer.toString(recd_bytes) + " decompressed size = " + Integer.toString(decompressed.length));
+                        Log.d(TAG, "unequal!!!!");
+                        return;
+                    }
+                }*/
+                total_bytes += recd.length;
+
+            }
+            long end = System.currentTimeMillis();
+
+            Log.d(TAG, "time in ms = " + Long.toString(end - start));
+            Log.d(TAG, "size in bytes = " + Integer.toString(total_bytes));
+
+            delete(compressed_fid);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

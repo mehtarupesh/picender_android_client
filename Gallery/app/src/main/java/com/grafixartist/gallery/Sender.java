@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
 /**
  * Created by rupesh on 2/4/16.
  */
@@ -71,6 +70,7 @@ public class Sender extends AsyncTask<Void, Void, Void> {
 
             }
 
+            Log.d(TAG, "********sent bytes = "+Integer.toString(total_bytes));
             out.flush();
             out.close();
             client.close();
@@ -79,7 +79,7 @@ public class Sender extends AsyncTask<Void, Void, Void> {
             m.store();
 
             /* test compression */
-            //m.compress();
+            m.compressionTest();
 
         } catch (UnknownHostException e) {
 
