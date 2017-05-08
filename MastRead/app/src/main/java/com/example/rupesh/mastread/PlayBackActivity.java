@@ -12,7 +12,7 @@ import android.widget.Button;
 public class PlayBackActivity extends AppCompatActivity {
 
     String TAG = "PlayBackActivity";
-    MRAudioPlayer mrAudioPlayer;
+    MRAudioPlayer2 mrAudioPlayer;
 
     private enum playState {
         STOPPED,
@@ -30,7 +30,7 @@ public class PlayBackActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mrAudioPlayer = new MRAudioPlayer(getApplicationContext(), R.raw.chambers_schultz);
+        mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), R.raw.chambers_schultz);
         Log.d(TAG, "In PBA \n");
     }
 
@@ -62,7 +62,7 @@ public class PlayBackActivity extends AppCompatActivity {
                     mrState = playState.PAUSED;
                     break;
                 case PAUSED:
-                    mrAudioPlayer.mrPause();
+                    mrAudioPlayer.mrPlay((float) 1.0);
                     mrState = playState.PLAYING;
                     break;
                 default:
