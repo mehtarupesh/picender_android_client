@@ -191,7 +191,6 @@ public class TextViewDisplayEngine {
 
         Range r = new Range(start, end);
         return r;
-
     }
 
     public Range getDummyFramePrevious(Range r) {

@@ -104,7 +104,6 @@ public class PlayBackActivity extends AppCompatActivity {
             return;
 
         int handle;
-
         if (focus == -1) {
             int currentTime = mrAudioPlayer.getCurrentPosition();
             handle = mrSyncWordEngine.getHandleFromTimeStamp(currentTime);
@@ -119,7 +118,6 @@ public class PlayBackActivity extends AppCompatActivity {
     }
 
     private void processOnPlay() {
-
         if (focus != -1) {
             int seekTime = mrSyncWordEngine.getStartTimeFromHandle(focus);
             mrAudioPlayer.setPosition(seekTime);
