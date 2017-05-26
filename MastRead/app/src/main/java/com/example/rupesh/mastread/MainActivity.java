@@ -35,6 +35,12 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, PlayBackActivity.class);
         startActivity(intent);
     }
+
+    public void cameraCapture(View view) {
+        Log.d(TAG, "capturing image");
+        Intent intent = new Intent(MainActivity.this, CameraActivity.class);
+        startActivity(intent);
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will

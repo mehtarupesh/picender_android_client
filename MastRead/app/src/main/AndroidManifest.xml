@@ -27,6 +27,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.rupesh.mastread.MainActivity" />
         </activity>
+        <activity
+            android:name=".CameraActivity"
+            android:label="@string/title_activity_camera"
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

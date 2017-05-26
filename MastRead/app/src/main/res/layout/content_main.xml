@@ -15,9 +15,19 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="start !"
+        android:text="TextView"
         android:id="@+id/button"
         android:onClick="playBackAudio"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Camera"
+        android:onClick="cameraCapture"
+        android:id="@+id/button5"
+        android:layout_below="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="79dp" />
 </RelativeLayout>
