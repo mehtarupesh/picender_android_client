@@ -1,11 +1,9 @@
 package com.example.rupesh.mastread;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by rupesh on 5/7/17.
@@ -19,6 +17,7 @@ public class MRAudioPlayer2 {
                          int resId) {
 
         mediaPlayer = MediaPlayer.create(context, resId);
+
 
         if (mediaPlayer == null) {
             Log.d(TAG, "MRAudioPlayer2 create FAILED!\n");

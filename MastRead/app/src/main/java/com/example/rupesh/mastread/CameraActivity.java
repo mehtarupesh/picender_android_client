@@ -2,39 +2,21 @@ package com.example.rupesh.mastread;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.googlecode.tesseract.android.TessBaseAPI;
-
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
+import com.googlecode.tesseract.android.OCR;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import org.opencv.imgproc.Imgproc;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -45,7 +27,7 @@ public class CameraActivity extends AppCompatActivity {
     private String tempImagePath;
     private File tempImageFile;
     static File storageDir;
-    private OpenCVImageProcessing mrImageProcessing;
+    private OCR mrOCR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,15 +41,7 @@ public class CameraActivity extends AppCompatActivity {
         } catch (IOException ex) {
             Log.d(TAG, "IOException : " + ex.toString());
         }
-
-        mrImageProcessing = new OpenCVImageProcessing(this);
         takePictureViaIntent();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mrImageProcessing.OpenCVOnResume(this);
     }
 
     private void prepareOCR() {
@@ -83,8 +57,10 @@ public class CameraActivity extends AppCompatActivity {
         String tessDataFilePath = tessDataDirPath + "/" + "eng.traineddata";
         File tessDataFile = new File(tessDataFilePath);
 
+
         if (!tessDataFile.exists()) {
-            InputStream in = (InputStream)this.getResources().openRawResource(R.raw.eng);
+
+            InputStream in = (InputStream) this.getResources().openRawResource(R.raw.eng);
             try {
                 OutputStream out = new FileOutputStream(tessDataFile);
                 byte buf[] = new byte[1024];
@@ -103,6 +79,9 @@ public class CameraActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        mrOCR = new OCR(storageDir.getAbsolutePath());
+
     }
 
     private void createTempImageFile() throws IOException {
@@ -139,45 +118,19 @@ public class CameraActivity extends AppCompatActivity {
             mrImageView.setImageBitmap(imageBitMap);*/
 
             Log.d(TAG, "Image size = " + tempImageFile.length());
-            mrImageBitMap = mrImageProcessing.preProcessImage(tempImagePath);
-            //mrImageBitMap = SimpleImageProcessing.preProcessImage(tempImagePath);
+
+            mrImageBitMap = SimpleImageProcessing.preProcessImage(tempImagePath);
+
+            Log.d(TAG, "Calling TextFairy");
+            mrImageBitMap = mrOCR.preProcessImageUsingTextFairyMagic(mrImageBitMap);
 
             mrImageView.setImageBitmap(mrImageBitMap);
 
             Log.d(TAG, "calling OCRtest");
-            doOCRTest();
+            mrOCR.doOCRTest(mrImageBitMap);
             Log.d(TAG, "exit OCRtest");
         }
     }
 
-
-
-    private void doOCRTest() {
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                TessBaseAPI baseApi = new TessBaseAPI();
-                baseApi.setDebug(true);
-                baseApi.init(storageDir.getAbsolutePath(), "eng");
-                Log.d(TAG, "done init OCRtest");
-
-                assert(mrImageBitMap != null);
-
-                baseApi.setImage(mrImageBitMap);
-
-                Log.d(TAG, "done setImage OCRtest");
-
-                String recognizedText = baseApi.getUTF8Text();
-
-                Log.d(TAG, "Recognized text - " + recognizedText);
-
-                baseApi.end();
-            }
-        };
-
-        new Thread(runnable).start();
-
-    }
 
 }

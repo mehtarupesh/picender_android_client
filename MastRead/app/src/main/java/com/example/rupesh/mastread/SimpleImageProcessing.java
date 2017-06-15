@@ -17,12 +17,16 @@ public class SimpleImageProcessing {
     static final String TAG = "SimpleImageProcessing";
 
     public static Bitmap preProcessImage(String bmapPath) {
-        Bitmap sampled =  getSampledBitmap(bmapPath, 800, 600);
-        Bitmap equalized = equalizeBitmap(sampled);
-        Bitmap cbCorrected = changeBitmapContrastBrightness(equalized, 5, -100);
-        Bitmap gray = createGrayscale(cbCorrected);
 
-        return gray;
+        Bitmap ret;
+
+        Bitmap sampled =  getSampledBitmap(bmapPath, 800, 600);
+        //Bitmap equalized = equalizeBitmap(sampled);
+        //Bitmap cbCorrected = changeBitmapContrastBrightness(equalized, 5, -100);
+        //Bitmap gray = createGrayscale(cbCorrected);
+
+        ret = sampled;
+        return ret;
     }
 
     public static Bitmap getSampledBitmap(String path, int width, int height) {
