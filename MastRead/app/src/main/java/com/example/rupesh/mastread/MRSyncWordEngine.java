@@ -7,9 +7,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -21,13 +23,11 @@ public class MRSyncWordEngine {
     private String TAG = "MRSyncWordEngine";
     private MRSyncWordFormat1 jsonFormat;
 
-    public MRSyncWordEngine(Context context,
-                            int resId) {
+    private void initSyncWordEngine(InputStream in) {
+
         /* get the format */
         jsonFormat = new MRSyncWordFormat1();
 
-        /* build json string */
-        InputStream in = (InputStream) context.getResources().openRawResource(resId);
         int size = 0;
         byte[] buffer = {0};
         try {
@@ -54,9 +54,9 @@ public class MRSyncWordEngine {
             tempWordSyncArray = new JSONArray(jsonString);
 
             for (int i = 0; i < tempWordSyncArray.length(); i++) {
-                    //if (jsonFormat.isValidEntry(tempWordSyncArray.getJSONObject(i))) {
-                        wordSyncArray.put(tempWordSyncArray.getJSONObject(i));
-                    //}
+                //if (jsonFormat.isValidEntry(tempWordSyncArray.getJSONObject(i))) {
+                wordSyncArray.put(tempWordSyncArray.getJSONObject(i));
+                //}
             }
 
             Log.d(TAG, "Number of timed words =" + wordSyncArray.length());
@@ -64,6 +64,25 @@ public class MRSyncWordEngine {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public MRSyncWordEngine(Context context,
+                            File file) {
+         /* build json string */
+        try {
+            InputStream in = new FileInputStream(file);
+            initSyncWordEngine(in);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    public MRSyncWordEngine(Context context,
+                            int resId) {
+
+        InputStream in = (InputStream) context.getResources().openRawResource(resId);
+        initSyncWordEngine(in);
+
     }
 
     public Boolean isValidHandle(int handle) {

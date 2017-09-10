@@ -19,6 +19,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.example.rupesh.mastread.OCRCallback;
 import com.example.rupesh.mastread.R;
 import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.ReadFile;
@@ -37,6 +38,7 @@ public class OCR  {
     public static final String EXTRA_OCR_BOX = "ocr_box";
     private static final String LOG_TAG = OCR.class.getSimpleName();
     private TessBaseAPI baseApi;
+    private OCRCallback mrOcrCb;
 
     static {
         //System.loadLibrary("pngo");
@@ -47,18 +49,14 @@ public class OCR  {
 
     }
 
-    public OCR(String path) {
-        baseApi = new TessBaseAPI();
-        Log.d(TAG, "done create OCRtest");
-        baseApi.init(path, "eng");
-        Log.d(TAG, "done init OCRtest");
-    }
+    public OCR(String storageDirPath, Context context, OCRCallback ocrCb) {
 
-    private void prepareOCR(String storageDirPath, Context context) {
+        /* set-up callback */
+        mrOcrCb = ocrCb;
 
+        /* copy trained file for english language */
         String tessDataDirPath = storageDirPath + "/" + "tessdata";
         File tessDataDir = new File (tessDataDirPath);
-
         if (!tessDataDir.exists()) {
             tessDataDir.mkdirs();
         }
@@ -89,31 +87,26 @@ public class OCR  {
             }
         }
 
+        /* init lib */
+        baseApi = new TessBaseAPI();
+        baseApi.init(storageDirPath, "eng");
     }
 
-    public void doOCRTest(final Bitmap bmap) {
+    public void doOCR(final Bitmap bmap) {
 
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
 
                 assert(bmap != null);
-
                 Bitmap bmapCopy = bmap.copy(bmap.getConfig(), true);
+
                 baseApi.setImage(bmapCopy);
-
                 Log.d(TAG, "done setImage OCRtest");
-
                 String recognizedText = baseApi.getUTF8Text();
+                //baseApi.end();
 
-                for (int iter = 0; iter < recognizedText.length(); iter++) {
-                    Log.i(TAG, Character.toString(recognizedText.charAt(iter)));
-                }
-
-                Log.d(TAG, "------------------------- Recognized text length - " + recognizedText.length());
-
-
-                baseApi.end();
+                mrOcrCb.ocrCallback(recognizedText);
             }
         };
 

@@ -3,7 +3,10 @@ package com.example.rupesh.mastread;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
+import android.net.Uri;
 import android.util.Log;
+
+import java.io.File;
 
 /**
  * Created by rupesh on 5/7/17.
@@ -13,16 +16,11 @@ public class MRAudioPlayer2 {
     private String TAG = "MRAudioPlayer2";
     private Boolean isLoaded = false;
 
-    public MRAudioPlayer2(Context context,
-                         int resId) {
 
-        mediaPlayer = MediaPlayer.create(context, resId);
+    private void initMediaPlayer() {
 
+        assert (mediaPlayer != null);
 
-        if (mediaPlayer == null) {
-            Log.d(TAG, "MRAudioPlayer2 create FAILED!\n");
-            return;
-        }
         isLoaded = true;
         Log.d(TAG, "MRAudioPlayer2 create DONE!\n");
 
@@ -44,6 +42,30 @@ public class MRAudioPlayer2 {
                 mp.release();
             }
         });
+    }
+
+    public MRAudioPlayer2(Context context,
+                          File file) {
+
+        mediaPlayer = MediaPlayer.create(context, Uri.fromFile(file));
+
+        if (mediaPlayer == null) {
+            Log.d(TAG, "MRAudioPlayer2 create FAILED!\n");
+            return;
+        }
+        initMediaPlayer();
+    }
+
+    public MRAudioPlayer2(Context context,
+                         int resId) {
+
+        mediaPlayer = MediaPlayer.create(context, resId);
+
+        if (mediaPlayer == null) {
+            Log.d(TAG, "MRAudioPlayer2 create FAILED!\n");
+            return;
+        }
+        initMediaPlayer();
     }
 
     public void mrPlay(float rate) {

@@ -1,0 +1,146 @@
+[{"text":"Prince", "start":1730, "end":2070, "isPrecededBy":"dn", "confidence":2.62}
+,{"text":"Brahma", "start":2170, "end":2460, "isPrecededBy":"w", "confidence":2.28}
+,{"text":"-"}
+,{"text":"datta", "start":2460, "end":2830, "confidence":1.81}
+,{"text":"ascended", "start":3170, "end":3600, "isPrecededBy":"w", "confidence":4.77}
+,{"text":"the", "start":3600, "end":3710, "isPrecededBy":"w", "confidence":4.80}
+,{"text":"throne", "start":3710, "end":4090, "isPrecededBy":"w", "confidence":2.79}
+,{"text":"after", "start":4300, "end":4550, "isPrecededBy":"w", "confidence":3.33}
+,{"text":"his", "start":4550, "end":4790, "isPrecededBy":"w", "confidence":1.80}
+,{"text":"father's", "start":4790, "end":5230, "isPrecededBy":"w", "confidence":3.97}
+,{"text":"death", "start":5230, "end":5530, "isPrecededBy":"w", "confidence":2.62}
+,{"text":"."}
+,{"text":"He", "start":6500, "end":6660, "isPrecededBy":"w", "confidence":3.43}
+,{"text":"had", "start":6660, "end":6840, "isPrecededBy":"w", "confidence":5.76}
+,{"text":"received", "start":6840, "end":7200, "isPrecededBy":"w", "confidence":3.46}
+,{"text":"his", "start":7200, "end":7340, "isPrecededBy":"w", "confidence":3.23}
+,{"text":"education", "start":7340, "end":7980, "isPrecededBy":"w", "confidence":4.22}
+,{"text":"at", "start":8310, "end":8480, "isPrecededBy":"w", "confidence":3.17}
+,{"text":"the", "start":8480, "end":8570, "isPrecededBy":"w", "confidence":7.28}
+,{"text":"famous", "start":8570, "end":8970, "isPrecededBy":"w", "confidence":3.91}
+,{"text":"university", "start":8970, "end":9550, "isPrecededBy":"w", "confidence":4.14}
+,{"text":"of", "start":9550, "end":9680, "isPrecededBy":"w", "confidence":3.05}
+,{"text":"Takshashila", "start":10030, "end":10590, "isPrecededBy":"w", "confidence":4.02}
+,{"text":"."}
+,{"text":"He", "start":11610, "end":11810, "isPrecededBy":"w", "confidence":3.01}
+,{"text":"had", "start":11810, "end":11990, "isPrecededBy":"w", "confidence":5.86}
+,{"text":"mastered", "start":11990, "end":12460, "isPrecededBy":"w", "confidence":3.27}
+,{"text":"all", "start":12520, "end":12710, "isPrecededBy":"w", "confidence":1.96}
+,{"text":"branches", "start":12710, "end":13290, "isPrecededBy":"w", "confidence":2.81}
+,{"text":"of", "start":13510, "end":13610, "isPrecededBy":"w", "confidence":3.20}
+,{"text":"learning", "start":13690, "end":14030, "isPrecededBy":"w", "confidence":3.63}
+,{"text":"and", "start":14030, "end":14120, "isPrecededBy":"w", "confidence":9.37}
+,{"text":"arts", "start":14120, "end":14580, "isPrecededBy":"w", "confidence":2.23}
+,{"text":"."}
+,{"text":"His", "start":15400, "end":15630, "isPrecededBy":"w", "confidence":3.20}
+,{"text":"visage", "start":15660, "end":16080, "isPrecededBy":"w", "confidence":1.55}
+,{"text":"was", "start":16080, "end":16310, "isPrecededBy":"w", "confidence":4.25}
+,{"text":"noble", "start":16310, "end":16690, "isPrecededBy":"w", "confidence":3.27}
+,{"text":"and", "start":16830, "end":17000, "isPrecededBy":"w", "confidence":5.35}
+,{"text":"conduct", "start":17000, "end":17460, "isPrecededBy":"w", "confidence":4.58}
+,{"text":","}
+,{"text":"righteous", "start":17710, "end":18220, "isPrecededBy":"w", "confidence":1.11}
+,{"text":"."}
+,{"text":"He", "start":19180, "end":19350, "isPrecededBy":"w", "confidence":2.88}
+,{"text":"held", "start":19350, "end":19550, "isPrecededBy":"w", "confidence":4.13}
+,{"text":"no", "start":19550, "end":19670, "isPrecededBy":"w", "confidence":4.30}
+,{"text":"prejudices", "start":19670, "end":20450, "isPrecededBy":"w", "confidence":3.38}
+,{"text":"against", "start":20510, "end":20930, "isPrecededBy":"w", "confidence":3.65}
+,{"text":"anyone", "start":20930, "end":21340, "isPrecededBy":"w", "confidence":3.73}
+,{"text":"."}
+,{"text":"When", "start":22550, "end":22700, "isPrecededBy":"w", "confidence":4.52}
+,{"text":"people", "start":22700, "end":23060, "isPrecededBy":"w", "confidence":3.04}
+,{"text":"came", "start":23110, "end":23310, "isPrecededBy":"w", "confidence":4.45}
+,{"text":"to", "start":23310, "end":23440, "isPrecededBy":"w", "confidence":4.14}
+,{"text":"him", "start":23440, "end":23580, "isPrecededBy":"w", "confidence":4.11}
+,{"text":"with", "start":23580, "end":23730, "isPrecededBy":"w", "confidence":3.03}
+,{"text":"their", "start":23730, "end":23870, "isPrecededBy":"w", "confidence":4.67}
+,{"text":"grievances", "start":23870, "end":24580, "isPrecededBy":"w", "confidence":2.79}
+,{"text":","}
+,{"text":"he", "start":24920, "end":25010, "isPrecededBy":"w", "confidence":4.55}
+,{"text":"listened", "start":25010, "end":25290, "isPrecededBy":"w", "confidence":5.91}
+,{"text":"to", "start":25290, "end":25410, "isPrecededBy":"w", "confidence":3.80}
+,{"text":"them", "start":25410, "end":25570, "isPrecededBy":"w", "confidence":5.35}
+,{"text":"patiently", "start":25570, "end":26190, "isPrecededBy":"w", "confidence":3.83}
+,{"text":"and", "start":26300, "end":26480, "isPrecededBy":"w", "confidence":3.94}
+,{"text":"gave", "start":26480, "end":26640, "isPrecededBy":"w", "confidence":4.59}
+,{"text":"judgements", "start":26640, "end":27180, "isPrecededBy":"w", "confidence":3.74}
+,{"text":"without", "start":27180, "end":27470, "isPrecededBy":"w", "confidence":3.88}
+,{"text":"partiality", "start":27470, "end":28140, "isPrecededBy":"w", "confidence":3.76}
+,{"text":"."}
+,{"text":"He", "start":28920, "end":29060, "isPrecededBy":"w", "confidence":3.60}
+,{"text":"was", "start":29060, "end":29330, "isPrecededBy":"w", "confidence":3.30}
+,{"text":"loved", "start":29330, "end":29550, "isPrecededBy":"w", "confidence":3.63}
+,{"text":"by", "start":29550, "end":29680, "isPrecededBy":"w", "confidence":3.57}
+,{"text":"all", "start":29710, "end":29920, "isPrecededBy":"w", "confidence":1.87}
+,{"text":"his", "start":29920, "end":30040, "isPrecededBy":"w", "confidence":5.00}
+,{"text":"subjects", "start":30040, "end":30610, "isPrecededBy":"w", "confidence":3.50}
+,{"text":"."}
+,{"text":"Following", "start":31810, "end":32240, "isPrecededBy":"dn", "confidence":2.71}
+,{"text":"his", "start":32240, "end":32380, "isPrecededBy":"w", "confidence":3.16}
+,{"text":"example", "start":32380, "end":32960, "isPrecededBy":"w", "confidence":3.18}
+,{"text":","}
+,{"text":"his", "start":33260, "end":33470, "isPrecededBy":"w", "confidence":3.99}
+,{"text":"ministers", "start":33470, "end":34040, "isPrecededBy":"w", "confidence":4.29}
+,{"text":"and", "start":34090, "end":34230, "isPrecededBy":"w", "confidence":4.27}
+,{"text":"other", "start":34270, "end":34420, "isPrecededBy":"w", "confidence":4.13}
+,{"text":"officers", "start":34460, "end":35080, "isPrecededBy":"w", "confidence":2.98}
+,{"text":"also", "start":35380, "end":35680, "isPrecededBy":"w", "confidence":3.24}
+,{"text":"administered", "start":35720, "end":36250, "isPrecededBy":"w", "confidence":4.37}
+,{"text":"law", "start":36250, "end":36450, "isPrecededBy":"w", "confidence":3.70}
+,{"text":"with", "start":36450, "end":36610, "isPrecededBy":"w", "confidence":0.70}
+,{"text":"justice", "start":36650, "end":37110, "isPrecededBy":"w", "confidence":3.22}
+,{"text":"."}
+,{"text":"And", "start":37760, "end":37950, "isPrecededBy":"w", "confidence":4.32}
+,{"text":"yet", "start":37950, "end":38190, "isPrecededBy":"w", "confidence":3.70}
+,{"text":","}
+,{"text":"the", "start":38490, "end":38570, "isPrecededBy":"w", "confidence":5.54}
+,{"text":"young", "start":38570, "end":38810, "isPrecededBy":"w", "confidence":4.08}
+,{"text":"king", "start":38810, "end":39100, "isPrecededBy":"w", "confidence":3.49}
+,{"text":"was", "start":39100, "end":39290, "isPrecededBy":"w", "confidence":3.40}
+,{"text":"not", "start":39290, "end":39520, "isPrecededBy":"w", "confidence":3.48}
+,{"text":"happy", "start":39520, "end":39870, "isPrecededBy":"w", "confidence":4.08}
+,{"text":"."}
+,{"text":"The", "start":40790, "end":40890, "isPrecededBy":"dn", "confidence":2.84}
+,{"text":"king", "start":40890, "end":41130, "isPrecededBy":"w", "confidence":4.38}
+,{"text":"noticed", "start":41130, "end":41610, "isPrecededBy":"w", "confidence":3.82}
+,{"text":"that", "start":41900, "end":42050, "isPrecededBy":"w", "confidence":5.45}
+,{"text":"the", "start":42050, "end":42110, "isPrecededBy":"w", "confidence":10.90}
+,{"text":"law", "start":42110, "end":42320, "isPrecededBy":"w", "confidence":3.49}
+,{"text":"suits", "start":42320, "end":42740, "isPrecededBy":"w", "confidence":2.15}
+,{"text":"that", "start":42740, "end":42920, "isPrecededBy":"w", "confidence":3.15}
+,{"text":"came", "start":42920, "end":43180, "isPrecededBy":"w", "confidence":3.59}
+,{"text":"to", "start":43180, "end":43300, "isPrecededBy":"w", "confidence":2.19}
+,{"text":"his", "start":43300, "end":43470, "isPrecededBy":"w", "confidence":3.51}
+,{"text":"court", "start":43470, "end":43790, "isPrecededBy":"w", "confidence":4.45}
+,{"text":"gradually", "start":44290, "end":44870, "isPrecededBy":"w", "confidence":2.88}
+,{"text":"reduced", "start":44950, "end":45330, "isPrecededBy":"w", "confidence":2.88}
+,{"text":"in", "start":45330, "end":45440, "isPrecededBy":"w", "confidence":3.04}
+,{"text":"number", "start":45440, "end":45800, "isPrecededBy":"w", "confidence":4.24}
+,{"text":"."}
+,{"text":"In", "start":46710, "end":46840, "isPrecededBy":"w", "confidence":3.96}
+,{"text":"fact", "start":46840, "end":47200, "isPrecededBy":"w", "confidence":3.98}
+,{"text":","}
+,{"text":"there", "start":47500, "end":47640, "isPrecededBy":"w", "confidence":3.30}
+,{"text":"came", "start":47640, "end":47900, "isPrecededBy":"w", "confidence":3.03}
+,{"text":"a", "start":47900, "end":47930, "isPrecededBy":"w", "confidence":10.45}
+,{"text":"time", "start":47930, "end":48250, "isPrecededBy":"w", "confidence":2.89}
+,{"text":"when", "start":48430, "end":48590, "isPrecededBy":"w", "confidence":3.53}
+,{"text":"the", "start":48590, "end":48650, "isPrecededBy":"w", "confidence":10.15}
+,{"text":"hustle", "start":48650, "end":48980, "isPrecededBy":"w", "confidence":4.76}
+,{"text":"and", "start":48980, "end":49140, "isPrecededBy":"w", "confidence":3.40}
+,{"text":"bustle", "start":49140, "end":49430, "isPrecededBy":"w", "confidence":4.45}
+,{"text":"in", "start":49590, "end":49690, "isPrecededBy":"w", "confidence":5.95}
+,{"text":"the", "start":49690, "end":49770, "isPrecededBy":"w", "confidence":7.91}
+,{"text":"courts", "start":49770, "end":50080, "isPrecededBy":"w", "confidence":4.92}
+,{"text":"of", "start":50080, "end":50160, "isPrecededBy":"w", "confidence":6.83}
+,{"text":"law", "start":50270, "end":50450, "isPrecededBy":"w", "confidence":2.19}
+,{"text":"ceased", "start":50780, "end":51120, "isPrecededBy":"w", "confidence":3.98}
+,{"text":"altogether", "start":51200, "end":51810, "isPrecededBy":"w", "confidence":2.92}
+,{"text":"."}
+,{"text":"The", "start":52520, "end":52600, "isPrecededBy":"w", "confidence":4.85}
+,{"text":"courts", "start":52600, "end":52940, "isPrecededBy":"w", "confidence":4.43}
+,{"text":"were", "start":52940, "end":53030, "isPrecededBy":"w", "confidence":4.92}
+,{"text":"almost", "start":53080, "end":53500, "isPrecededBy":"w", "confidence":3.26}
+,{"text":"deserted", "start":53680, "end":54140, "isPrecededBy":"w", "confidence":3.46}
+,{"text":"."}]

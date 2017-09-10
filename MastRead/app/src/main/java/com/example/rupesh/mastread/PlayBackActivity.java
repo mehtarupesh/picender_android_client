@@ -1,18 +1,14 @@
 package com.example.rupesh.mastread;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.io.File;
 
 public class PlayBackActivity extends AppCompatActivity {
 
@@ -29,6 +25,21 @@ public class PlayBackActivity extends AppCompatActivity {
     };
     private playState mrState = playState.STOPPED;
 
+
+    private File fileAtPathExists(String path) {
+        File ret = null;
+
+        if (path == null)
+            return ret;
+
+        ret = new File(path);
+
+        if (!ret.exists()) {
+            ret = null;
+        }
+        return ret;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,11 +48,40 @@ public class PlayBackActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        String displayText = "404 : Page not found!";
+        Page page_info = (Page) getIntent().getSerializableExtra("PAGE_INFO");
+        File audioFilePath = null;
+        File jsonFilePath = null;
+        if (page_info != null) {
+            Log.d(TAG, "Playing page : \n" + page_info.toString());
+            displayText = page_info.getBookId() + "\n" + "Page number : " + page_info.getNumber();
+            audioFilePath = fileAtPathExists(page_info.getAudioPath());
+            jsonFilePath = fileAtPathExists(page_info.getJsonPath());
+        }
+
         /* starting word is index 0 */
         focus = 0;
-        mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), R.raw.chambers_schultz);
-        mrSyncWordEngine = new MRSyncWordEngine(getApplicationContext(), R.raw.chambers_schultz_json);
+
+        if (audioFilePath != null && jsonFilePath != null) {
+
+            Log.d(TAG, "audio file size = " + audioFilePath.length());
+            Log.d(TAG, "json file size = " + jsonFilePath.length());
+            mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), audioFilePath);
+            mrSyncWordEngine = new MRSyncWordEngine(getApplicationContext(), jsonFilePath);
+        } else {
+            displayText += "\nSource Files not found, playing default:(";
+            audioFilePath = new File("/storage/emulated/0/Android/data/com.example.rupesh.mastread/files/mast_read_book_1/page_1.mp3");
+            jsonFilePath = new File("/storage/emulated/0/Android/data/com.example.rupesh.mastread/files/mast_read_book_1/page_1.json");
+
+            Log.d(TAG, "audio file size = " + audioFilePath.length());
+            Log.d(TAG, "json file size = " + jsonFilePath.length());
+
+            mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), audioFilePath);
+            mrSyncWordEngine = new MRSyncWordEngine(getApplicationContext(), jsonFilePath);
+        }
+
         mrTextViewDisplayEngine = new TextViewDisplayEngine((TextView) findViewById(R.id.textView), mrSyncWordEngine);
+        ((TextView) findViewById(R.id.textView)).setText(displayText);
         Log.d(TAG, "In PBA \n");
     }
 
