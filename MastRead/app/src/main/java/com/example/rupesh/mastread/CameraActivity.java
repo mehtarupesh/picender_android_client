@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
@@ -85,6 +86,8 @@ public class CameraActivity extends AppCompatActivity implements OCRCallback {
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            } else {
+                tempImageFile.delete();
             }
         }
     }
@@ -124,10 +127,15 @@ public class CameraActivity extends AppCompatActivity implements OCRCallback {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "req code " + requestCode + " resultCode " + resultCode);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
             Log.d(TAG, "Image size = " + tempImageFile.length());
             mrImageBitMap = SimpleImageProcessing.preProcessImage(tempImageFile.getAbsolutePath());
+
+            // done with tempFile, delete it.
+            tempImageFile.delete();
+
             Log.d(TAG, "Calling TextFairy");
             mrImageBitMap = mrOCR.preProcessImageUsingTextFairyMagic(mrImageBitMap);
 
@@ -136,6 +144,11 @@ public class CameraActivity extends AppCompatActivity implements OCRCallback {
             subImageIndex = 0;
             runOcr(mrSubImagesBitMap.get(getImageIndex(subImageIndex)));
             mrCme.startSearch();
+        } else {
+
+            // Go back to parent activity
+            NavUtils.navigateUpFromSameTask(this);
+
         }
     }
 
@@ -176,6 +189,7 @@ public class CameraActivity extends AppCompatActivity implements OCRCallback {
                 mrCme.endSearch();
                 mrUIRunnableBitmap = mrImageBitMap;
                 runOnUiThread(mrUIRunnable);
+                Log.d(TAG, "Could not OCR\n");
             }
         }
 

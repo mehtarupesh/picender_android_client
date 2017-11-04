@@ -15,6 +15,10 @@ public final class MRDbContract {
         public static final String COLUMN_NAME_PAGE_TEXT = "pagetext";
         public static final String COLUMN_NAME_JSON_PATH = "jsonpath";
         public static final String COLUMN_NAME_AUDIO_PATH = "audiopath";
+        public static final String COLUMN_NAME_TEXT_PATH = "textpath";
+        public static final String COLUMN_NAME_BOARD = "board";
+        public static final String COLUMN_NAME_MEDIUM = "medium";
+        public static final String COLUMN_NAME_GRADE = "grade";
 
         //TODO: Linked tables if perf hit.
         //public static final String TABLE_NAME_FTS = "mastread_fts";

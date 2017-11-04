@@ -10,7 +10,7 @@ import android.util.Log;
  */
 public class MRDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 10;
     public static final String DATABASE_NAME = "MastRead.db";
     private final String TAG = "MRDbHelper";
 
@@ -21,7 +21,12 @@ public class MRDbHelper extends SQLiteOpenHelper {
                     MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_NUMBER + " INTEGER," +
                     MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_TEXT + " TEXT," +
                     MRDbContract.MRDbEntry.COLUMN_NAME_JSON_PATH + " TEXT UNIQUE," + /* Use json path as unique identifer which is ignored in fts; useful in normal */
-                    MRDbContract.MRDbEntry.COLUMN_NAME_AUDIO_PATH + " TEXT)";
+                    MRDbContract.MRDbEntry.COLUMN_NAME_AUDIO_PATH + " TEXT," +
+                    MRDbContract.MRDbEntry.COLUMN_NAME_TEXT_PATH + " TEXT," +
+                    MRDbContract.MRDbEntry.COLUMN_NAME_BOARD + " TEXT," +
+                    MRDbContract.MRDbEntry.COLUMN_NAME_MEDIUM + " TEXT," +
+                    MRDbContract.MRDbEntry.COLUMN_NAME_GRADE + " TEXT)";
+
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + MRDbContract.MRDbEntry.TABLE_NAME;
 

@@ -85,6 +85,32 @@ public class PlayBackActivity extends AppCompatActivity {
         Log.d(TAG, "In PBA \n");
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mrState == playState.PLAYING) {
+            processOnPause();
+            Button playPause = (Button) findViewById(R.id.button2);
+            //show the next available option
+            playPause.setText(getPlayPauseString(mrState));
+        }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+
     private String getPlayPauseString(playState state) {
         String ret = "ERROR!!";
         switch (mrState) {
@@ -121,38 +147,46 @@ public class PlayBackActivity extends AppCompatActivity {
     }
 
     public void forwardButton (View view) {
-        if (mrState != playState.PAUSED)
-            return;
 
-        int handle;
+        /* if paused, use as word selector */
+        if (mrState == playState.PAUSED) {
+            int handle;
 
-        if (focus == -1) {
-            int currentTime = mrAudioPlayer.getCurrentPosition();
-            handle = mrSyncWordEngine.getHandleFromTimeStamp(currentTime);
-        } else
-            handle = focus;
+            if (focus == -1) {
+                int currentTime = mrAudioPlayer.getCurrentPosition();
+                handle = mrSyncWordEngine.getHandleFromTimeStamp(currentTime);
+            } else
+                handle = focus;
 
-        if (mrTextViewDisplayEngine.display(handle + 1)) {
-            focus = handle + 1;
+            if (mrTextViewDisplayEngine.display(handle + 1)) {
+                focus = handle + 1;
+            }
+        }
+        /* if playing, use as playback speed control */
+        else if (mrState == playState.PLAYING) {
+            mrAudioPlayer.mrIncrementPlayBackRate();
+
         }
 
     }
 
 
     public void backwardButton (View view) {
-        if (mrState != playState.PAUSED)
-            return;
 
-        int handle;
-        if (focus == -1) {
-            int currentTime = mrAudioPlayer.getCurrentPosition();
-            handle = mrSyncWordEngine.getHandleFromTimeStamp(currentTime);
-        } else {
-            handle = focus;
-        }
+        if (mrState == playState.PAUSED) {
+            int handle;
+            if (focus == -1) {
+                int currentTime = mrAudioPlayer.getCurrentPosition();
+                handle = mrSyncWordEngine.getHandleFromTimeStamp(currentTime);
+            } else {
+                handle = focus;
+            }
 
-        if (mrTextViewDisplayEngine.display(handle - 1)) {
-            focus = handle - 1;
+            if (mrTextViewDisplayEngine.display(handle - 1)) {
+                focus = handle - 1;
+            }
+        } else if (mrState == playState.PLAYING) {
+            mrAudioPlayer.mrDecrementPlayBackRate();
         }
 
     }
@@ -162,7 +196,7 @@ public class PlayBackActivity extends AppCompatActivity {
             int seekTime = mrSyncWordEngine.getStartTimeFromHandle(focus);
             mrAudioPlayer.setPosition(seekTime);
         }
-        mrAudioPlayer.mrPlay((float) 1.0);
+        mrAudioPlayer.mrPlay();
         mrState = playState.PLAYING;
     }
 

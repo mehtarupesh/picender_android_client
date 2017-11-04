@@ -15,7 +15,10 @@ public class MRAudioPlayer2 {
     private MediaPlayer mediaPlayer;
     private String TAG = "MRAudioPlayer2";
     private Boolean isLoaded = false;
-
+    private float currentPlayBackRate;
+    private static final float playBackdelta   = 0.25f;
+    private static final float minPlayBackRate = 0.5f;
+    private static final float maxPlayBackRate = 2.0f;
 
     private void initMediaPlayer() {
 
@@ -42,6 +45,8 @@ public class MRAudioPlayer2 {
                 mp.release();
             }
         });
+
+        currentPlayBackRate = 1.0f;
     }
 
     public MRAudioPlayer2(Context context,
@@ -68,12 +73,12 @@ public class MRAudioPlayer2 {
         initMediaPlayer();
     }
 
-    public void mrPlay(float rate) {
+    public void mrPlay() {
 
         if (!isLoaded) {
             return;
         }
-        this.mrSetRate(rate);
+        this.mrSetRate(currentPlayBackRate);
         mediaPlayer.start();
     }
 
@@ -95,6 +100,26 @@ public class MRAudioPlayer2 {
         }
 
         mediaPlayer.start();
+    }
+
+    public void mrIncrementPlayBackRate() {
+        if (currentPlayBackRate + playBackdelta <= maxPlayBackRate) {
+            currentPlayBackRate += playBackdelta;
+            this.mrSetRate(currentPlayBackRate);
+        }
+        else {
+            Log.d(TAG, "cannot increment, currentRate : " + currentPlayBackRate);
+        }
+    }
+
+    public void  mrDecrementPlayBackRate() {
+        if (currentPlayBackRate - playBackdelta >= minPlayBackRate) {
+            currentPlayBackRate -= playBackdelta;
+            this.mrSetRate(currentPlayBackRate);
+        }
+        else {
+            Log.d(TAG, "cannot decrement, currentRate : " + currentPlayBackRate);
+        }
     }
 
     //rate 	float: playback rate (1.0 = normal playback, range 0.5 to 2.0)

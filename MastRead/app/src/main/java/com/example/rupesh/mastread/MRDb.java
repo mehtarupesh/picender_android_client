@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +25,10 @@ public class MRDb {
     }
 
     private String readFileToString(String filePath) {
+
+        File f = new File(filePath);
+        if (!f.exists())
+            return null;
 
         StringBuilder sb = new StringBuilder();
 
@@ -53,6 +58,33 @@ public class MRDb {
         }
 
         return sb.toString();
+    }
+
+
+    public void addTextBookEntry(TextBook b) {
+        SQLiteDatabase db = mrDbHelper.getWritableDatabase();
+
+        for (int i = 0; i < b.getPages().size(); i++) {
+
+            Page p = b.getPages().get(i);
+
+            // Assuming jsonPath to be unique per page
+            if (!jsonPathEntryExists(p.getJsonPath())) {
+                ContentValues values = new ContentValues();
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_BOOK_ID, b.getName());
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_NUMBER, p.getNumber());
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_TEXT, readFileToString(p.getTextPath()));
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_AUDIO_PATH, p.getAudioPath());
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_JSON_PATH, p.getJsonPath());
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_TEXT_PATH, p.getTextPath());
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_BOARD, b.getBoard());
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_MEDIUM, b.getMedium());
+                values.put(MRDbContract.MRDbEntry.COLUMN_NAME_GRADE, b.getGrade());
+
+                long rowId = db.insertWithOnConflict(MRDbContract.MRDbEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+                Log.d(TAG, "inserted rowId + " + rowId);
+            }
+        }
     }
 
     public void addEntry(Book b) {
@@ -251,6 +283,67 @@ public class MRDb {
             Log.d(TAG, "text size in chars = " + pageText.length());
             Log.d(TAG, "audioFilePath = " + audioFilePath);
             Log.d(TAG, "jsonFilePath = " + jsonFilePath);
+
+        }
+
+        cursor.close();
+
+    }
+
+    public void printTextBookInfo(String board, String medium, String grade, String bookName) {
+
+        SQLiteDatabase db = mrDbHelper.getReadableDatabase();
+
+        String [] projection = {
+                MRDbContract.MRDbEntry._ID,
+                MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_TEXT,
+                MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_NUMBER,
+                MRDbContract.MRDbEntry.COLUMN_NAME_AUDIO_PATH,
+                MRDbContract.MRDbEntry.COLUMN_NAME_JSON_PATH,
+                MRDbContract.MRDbEntry.COLUMN_NAME_TEXT_PATH
+
+        };
+
+        /* filter */
+        String selection = MRDbContract.MRDbEntry.COLUMN_NAME_BOARD + " = ?" + " AND " +
+                           MRDbContract.MRDbEntry.COLUMN_NAME_MEDIUM + " = ?" + " AND " +
+                           MRDbContract.MRDbEntry.COLUMN_NAME_GRADE + " = ?" + " AND " +
+                           MRDbContract.MRDbEntry.COLUMN_NAME_BOOK_ID + " = ?";
+
+        String[] selectionArgs = {board, medium, grade, bookName};
+
+        String sorOrder = MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_NUMBER + " ASC";
+
+        Cursor cursor = db.query(
+                MRDbContract.MRDbEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sorOrder
+        );
+
+        Log.d(TAG, "TEXT-BOOK = " + board + "/" + medium + "/" + grade + "/" + bookName);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+
+            int uid = cursor.getInt(cursor.getColumnIndex(MRDbContract.MRDbEntry._ID));
+            String pageText = cursor.getString(cursor.getColumnIndex(MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_TEXT));
+            int pageNumber = cursor.getInt(cursor.getColumnIndex(MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_NUMBER));
+            String audioFilePath = cursor.getString(cursor.getColumnIndex(MRDbContract.MRDbEntry.COLUMN_NAME_AUDIO_PATH));
+            String jsonFilePath = cursor.getString(cursor.getColumnIndex(MRDbContract.MRDbEntry.COLUMN_NAME_JSON_PATH));
+            String pageTextPath = cursor.getString(cursor.getColumnIndex(MRDbContract.MRDbEntry.COLUMN_NAME_TEXT_PATH));
+
+
+            Log.d(TAG, "uid = " + uid);
+            Log.d(TAG, "pageNum = " + pageNumber);
+
+            Log.d(TAG, "text  = " + pageText);
+
+            Log.d(TAG, "audioFilePath = " + audioFilePath);
+            Log.d(TAG, "jsonFilePath = " + jsonFilePath);
+            Log.d(TAG, "textpath = " + pageTextPath);
 
         }
 

@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
@@ -14,55 +13,58 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Created by rupesh on 6/15/17.
+ * Created by rupesh on 10/14/17.
  */
-public class MRResource {
-
-    //app packaged
-    AssetManager assetManager;
-    private final String TAG = "MRResource";
-
+public class MRNetworkEngine {
 
     private DownloadManager mrDm;
-    private downloadCallback mrDlCb;
-    private final String serverAddress= "http:192.168.1.6:8888";
+    private Long refId;
+    private String sampleFileName = "filelist.json";
+    private static String TAG = "MRNetworkEngine";
+    private Uri serverAddress;
 
-
-    public MRResource(Context context, downloadCallback cb) {
-
+    MRNetworkEngine(Context context, String addr)
+    {
         mrDm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         context.registerReceiver(onComplete,
                 new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        mrDlCb = cb;
+        serverAddress = Uri.parse(addr);
 
-        assetManager = context.getAssets();
     }
 
-    public Long downloadFile(Context context, String filePath) {
+    MRNetworkEngine(Context context) {
+        mrDm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        context.registerReceiver(onComplete,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
 
-        Uri Download_Uri = Uri.parse(serverAddress +"/" + filePath);
+
+    void testSampleDownload(Context context) {
+
+        Uri Download_Uri = Uri.parse("http:192.168.1.6:8888/filelist.json");
 
         DownloadManager.Request request = new DownloadManager.Request(Download_Uri);
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
         request.setAllowedOverRoaming(false);
-        request.setTitle("MastRead Downloading " + filePath);
-        request.setDescription("Downloading " + filePath);
+        request.setTitle("GadgetSaint Downloading " + "Sample" + ".png");
+        request.setDescription("Downloading " + "Sample" + ".png");
         request.setVisibleInDownloadsUi(true);
-        request.setDestinationInExternalFilesDir(context, null, filePath);
+        request.setDestinationInExternalFilesDir(context, null, sampleFileName);
 
-        return mrDm.enqueue(request);
+
+        refId = mrDm.enqueue(request);
     }
 
     BroadcastReceiver onComplete = new BroadcastReceiver() {
@@ -72,12 +74,15 @@ public class MRResource {
             // get the refid from the download manager
             long referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
             Log.d(TAG, "Download complete : referenceId out = " + referenceId);
+            Log.d(TAG, "refId expect = " + refId);
 
-            String downloadFilePath = DownloadStatus(referenceId);
-            File download = new File(downloadFilePath);
-            Log.d(TAG, "Downloaded File : " + download.getAbsolutePath());
+            if (referenceId == refId) {
 
-                /*try {
+                String downloadFilePath = DownloadStatus(referenceId);
+                File download = new File(downloadFilePath);
+                Log.d(TAG, "Filename : " + download.getAbsolutePath());
+
+                try {
                     BufferedReader br = new BufferedReader(new FileReader(download));
                     String line;
 
@@ -88,13 +93,15 @@ public class MRResource {
 
                 } catch (java.io.IOException e) {
                     e.printStackTrace();
-                }*/
+                }
 
-                mrDlCb.downloadFinishedCallback(download, referenceId);
+                parseJsonFilelist(download);
+            }
+
         }
     };
 
-    public ArrayList<TextBook> parseJsonFilelist(File jsonFile) {
+    private ArrayList<TextBook> parseJsonFilelist(File jsonFile) {
 
         ArrayList<TextBook> retList = new ArrayList<>();
         InputStream in = null;
@@ -139,15 +146,13 @@ public class MRResource {
 
                     JSONArray jsonArr = (JSONArray) jsonObj.get(key);
 
-                    /* TODO: sanity check for .json .txt .mp3 ??*/
                     assert(jsonArr.length() % 3 == 0);
                     TextBook tBook = new TextBook(components[0], components[1], components[2], components[3], jsonArr.length() / 3);
 
 
                     Log.d(TAG, "values :");
                     for (int i = 0; i < jsonArr.length(); i++) {
-                        /* create path folder + filename */
-                        tBook.addEntry(key + "/" + jsonArr.get(i).toString());
+                        tBook.addEntry(key + jsonArr.get(i).toString());
                         Log.d(TAG, jsonArr.get(i).toString());
                     }
 
@@ -170,7 +175,7 @@ public class MRResource {
 
     // path style : HACKY : "./BOARD_NAME/MEDIUM_NAME/GRADE/SUBJECT
     // split by "/" gives 5 individual strings
-    private String[] isValidTextBookPath(String directoryName) {
+    public static String[] isValidTextBookPath(String directoryName) {
 
         String[] directory = directoryName.split("/");
         String ret[] = new String[4];
@@ -281,118 +286,4 @@ public class MRResource {
 
 
     }
-
-    private String[] isValidResource(String bookDirPath) {
-
-        String[] dirContents = null;
-        try {
-            dirContents = assetManager.list(bookDirPath);
-
-            Log.d(TAG, "Book name = " + bookDirPath);
-
-
-            int num_pages = dirContents.length / 3;
-            int mp3_files = 0;
-            int text_files = 0;
-            int json_files = 0;
-
-            for (int i = 0; i <  dirContents.length; i++) {
-
-                Log.d(TAG, "content : " + dirContents[i]);
-                if (dirContents[i].contains( ".mp3")) {
-                    mp3_files++;
-                }
-
-                else if (dirContents[i].contains(".json")) {
-                    json_files++;
-
-                }
-
-                else if (dirContents[i].contains(".txt")) {
-                    text_files++;
-                }
-
-            }
-
-            //if (mp3_files != num_pages && text_files != num_pages && json_files != num_pages)
-            //    return null;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return dirContents;
-    }
-
-    private String[] copy_to_destination_folder(String assetDirName, String[] assetfileList, String dstRootDir) throws IOException {
-
-        String[] retVal = new String[assetfileList.length];
-
-        File dstDir = new File(dstRootDir + "/" + assetDirName);
-        if (dstDir.exists()) {
-            Log.d(TAG, "Already exists --> " + dstDir.getAbsolutePath());
-        } else {
-            dstDir.mkdirs();
-        }
-
-        for (int i = 0; i < assetfileList.length; i++) {
-
-            String sourceFilePath = assetDirName + "/" + assetfileList[i];
-            String dstFilePath = dstDir.getAbsolutePath() + "/" + assetfileList[i];
-
-            File dstFile = new File(dstFilePath);
-            if (!dstFile.exists() || dstFile.length() == 0){
-                OutputStream out = new FileOutputStream(dstFile);
-                byte[] buffer = new byte[1024];
-                int length;
-
-                Log.d(TAG, "sourceFilePath = " + sourceFilePath);
-                InputStream in = assetManager.open(sourceFilePath);
-
-                while ((length = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, length);
-                }
-
-                in.close();
-                out.flush();
-                out.close();
-            } else {
-                Log.d(TAG, "Already exists : " + dstFile);
-            }
-            retVal[i] = dstFilePath;
-        }
-
-        return retVal;
-    }
-
-    public ArrayList<Book> fetchResources(String dstRoot) {
-
-
-        ArrayList<Book> retList = new ArrayList<>();
-
-        try {
-            String[] rPaths = assetManager.list("");
-
-            Log.d(TAG, "Assets : size = " + rPaths.length + "\n");
-            for (int i = 0; i < rPaths.length; i++) {
-                Log.d(TAG, rPaths[i] + "\n");
-                String[] folderContents = null;
-                if (rPaths[i].contains("mast_read_book") && (folderContents = isValidResource(rPaths[i])) != null) {
-                    String[] ret = copy_to_destination_folder(rPaths[i], folderContents, dstRoot);
-
-                    Book b = new Book(rPaths[i]);
-                    b.addMultipleEntries(ret);
-                    retList.add(b);
-                    Log.d(TAG, b.toString());
-
-                }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return retList;
-    }
-
-
 }

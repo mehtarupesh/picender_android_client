@@ -3,25 +3,32 @@ package com.example.rupesh.mastread;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
  * Created by rupesh on 6/14/17.
  */
-public class ContentManagementEngine {
+public class ContentManagementEngine implements downloadCallback {
 
     private static final String TAG = "ContentManagerEngine";
     private static ContentManagementEngine mrCme;
     private static MRDb mrDb;
     private static MRResource mrResource;
-    private static ArrayList<Book> bookList;
+    private final String serverFileList = "filelist.json";
+
+
     private static boolean searchInProgress;
     private static String searchQuery;
 
     private ContentManagementEngine(Context context) {
                /* Update Database */
-        mrResource = new MRResource(context);
-        bookList = mrResource.fetchResources(context.getExternalFilesDir(null).getAbsolutePath());
+        mrResource = new MRResource(context, this);
+        mrResource.downloadFile(context, serverFileList);
+        mrDb = new MRDb(context);
+
+
+        /*ArrayList<Book> bookList = mrResource.fetchResources(context.getExternalFilesDir(null).getAbsolutePath());
 
         mrDb = new MRDb(context);
         Log.d(TAG, "Num DB entries = " + mrDb.getNumberofEntries());
@@ -29,7 +36,7 @@ public class ContentManagementEngine {
             Book b = bookList.get(i);
             mrDb.addEntry(b);
             mrDb.printBookInfo(b.getName());
-        }
+        }*/
 
         searchInProgress = false;
     }
@@ -110,5 +117,17 @@ public class ContentManagementEngine {
     public void endSearch() {
         searchInProgress = false;
         searchQuery = null;
+    }
+
+    @Override
+    public void downloadFinishedCallback(File dlFile, Long referenceId) {
+
+        ArrayList<TextBook> textBookList= mrResource.parseJsonFilelist(dlFile);
+        Log.d(TAG, "Num DB entries = " + mrDb.getNumberofEntries());
+        for (int i = 0; i < textBookList.size(); i++) {
+            TextBook tb = textBookList.get(i);
+            mrDb.addTextBookEntry(tb);
+             mrDb.printTextBookInfo(tb.getBoard(), tb.getMedium(), tb.getGrade(), tb.getName());
+        }
     }
 }

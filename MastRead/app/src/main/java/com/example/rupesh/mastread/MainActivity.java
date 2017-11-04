@@ -13,6 +13,8 @@ public class MainActivity extends AppCompatActivity {
 
     String TAG = "MainActivity";
     ContentManagementEngine mrCme;
+    MRNetworkEngine mrNe;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mrCme = ContentManagementEngine.getContentManagementEngine(getApplicationContext());
+        //mrNe = new MRNetworkEngine(getApplicationContext());
     }
 
     @Override
@@ -39,6 +42,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "capturing image");
         Intent intent = new Intent(MainActivity.this, CameraActivity.class);
         startActivity(intent);
+    }
+
+    public void serverDLTest(View view) {
+        Log.d(TAG, "Running server DL Test");
+        //mrNe.testSampleDownload(getApplicationContext());
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

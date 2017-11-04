@@ -1,5 +1,7 @@
 package com.example.rupesh.mastread;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 /**
@@ -9,6 +11,7 @@ public class Book {
     private ArrayList<Page> pages;
     private String name;
     private Range range;
+    private final String TAG = "Book";
 
     public String getName() {
         return name;
@@ -54,6 +57,8 @@ public class Book {
     public boolean addEntry(String pathToResource) {
 
         int pageNumber = getPageNumber(pathToResource);
+        Log.d(TAG, "path = " + pathToResource);
+        Log.d(TAG,"page number = " + pageNumber);
         boolean ret = false;
 
         if (range.inRange(pageNumber)) {
