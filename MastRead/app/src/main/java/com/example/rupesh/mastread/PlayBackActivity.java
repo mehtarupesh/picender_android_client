@@ -26,7 +26,7 @@ public class PlayBackActivity extends AppCompatActivity {
     private playState mrState = playState.STOPPED;
 
 
-    private File fileAtPathExists(String path) {
+    private File getFileFromPath(String path) {
         File ret = null;
 
         if (path == null)
@@ -35,7 +35,11 @@ public class PlayBackActivity extends AppCompatActivity {
         ret = new File(path);
 
         if (!ret.exists()) {
+
+            Log.d(TAG, "not found : " + path );
             ret = null;
+        } else {
+            Log.d(TAG, "found : " + path);
         }
         return ret;
     }
@@ -55,8 +59,12 @@ public class PlayBackActivity extends AppCompatActivity {
         if (page_info != null) {
             Log.d(TAG, "Playing page : \n" + page_info.toString());
             displayText = page_info.getBookId() + "\n" + "Page number : " + page_info.getNumber();
-            audioFilePath = fileAtPathExists(page_info.getAudioPath());
-            jsonFilePath = fileAtPathExists(page_info.getJsonPath());
+
+            Log.d(TAG, "mp3 played = " + page_info.getAudioPath());
+            Log.d(TAG,"json used = " + page_info.getJsonPath());
+
+            audioFilePath = getFileFromPath(MRResource.getAbsoluteFilePath(page_info.getAudioPath()));
+            jsonFilePath = getFileFromPath(MRResource.getAbsoluteFilePath(page_info.getJsonPath()));
         }
 
         /* starting word is index 0 */
@@ -66,18 +74,19 @@ public class PlayBackActivity extends AppCompatActivity {
 
             Log.d(TAG, "audio file size = " + audioFilePath.length());
             Log.d(TAG, "json file size = " + jsonFilePath.length());
+
             mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), audioFilePath);
             mrSyncWordEngine = new MRSyncWordEngine(getApplicationContext(), jsonFilePath);
         } else {
-            displayText += "\nSource Files not found, playing default:(";
-            audioFilePath = new File("/storage/emulated/0/Android/data/com.example.rupesh.mastread/files/mast_read_book_1/page_1.mp3");
-            jsonFilePath = new File("/storage/emulated/0/Android/data/com.example.rupesh.mastread/files/mast_read_book_1/page_1.json");
+            displayText += "\nSource Files not found:(";
+            //audioFilePath = new File("/storage/emulated/0/Android/data/com.example.rupesh.mastread/files/./Board1/MediumY/Grade3/mast_read_book_2/page_12.mp3");
+            //jsonFilePath = new File("/storage/emulated/0/Android/data/com.example.rupesh.mastread/files/./Board1/MediumY/Grade3/mast_read_book_2/page_12.json");
 
-            Log.d(TAG, "audio file size = " + audioFilePath.length());
-            Log.d(TAG, "json file size = " + jsonFilePath.length());
+            //Log.d(TAG, "audio file size = " + audioFilePath.length());
+            //Log.d(TAG, "json file size = " + jsonFilePath.length());
 
-            mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), audioFilePath);
-            mrSyncWordEngine = new MRSyncWordEngine(getApplicationContext(), jsonFilePath);
+            //mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), audioFilePath);
+            //mrSyncWordEngine = new MRSyncWordEngine(getApplicationContext(), jsonFilePath);
         }
 
         mrTextViewDisplayEngine = new TextViewDisplayEngine((TextView) findViewById(R.id.textView), mrSyncWordEngine);

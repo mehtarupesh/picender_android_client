@@ -45,8 +45,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void serverDLTest(View view) {
-        Log.d(TAG, "Running server DL Test");
-        //mrNe.testSampleDownload(getApplicationContext());
+        Log.d(TAG, "Running Book Select test");
+/*
+        String board = "Board2";
+        String medium = "MediumX";
+        String grade = "Grade1";
+        String bookName = "mast_read_book_3";
+
+        String board = "Board1";
+        String medium = "MediumY";
+        String grade = "Grade3";
+        String bookName = "mast_read_book_2";
+        mrCme.downloadTextBookWithoutAudio(getApplicationContext(), board, medium, grade, bookName);
+
+*/
+
+        String bookDir = MRResource.getAbsoluteFilePath("BOOKS");
+        Intent intent = new Intent(getApplicationContext(), BookBrowser.class);
+        intent.putExtra(BookBrowser.TOKEN, bookDir);
+        getApplicationContext().startActivity(intent);
 
     }
     @Override

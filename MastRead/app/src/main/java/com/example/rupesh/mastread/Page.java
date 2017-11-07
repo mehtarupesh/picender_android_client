@@ -11,6 +11,15 @@ public class Page implements Serializable {
     private String textPath;
     private String audioPath;
     private String jsonPath;
+    private Boolean audioIsOnDevice;
+
+    public void setAudioIsOnDevice(Boolean audioIsOnDevice) {
+        this.audioIsOnDevice = audioIsOnDevice;
+    }
+
+    public Boolean getAudioIsOnDevice() {
+        return audioIsOnDevice;
+    }
 
     Page(int id) {
         number= id;
@@ -21,19 +30,29 @@ public class Page implements Serializable {
         this.number = pageNumber;
     }
 
-    private boolean isTextFile(String path) {
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public void setAudioPath(String audioPath) {
+        this.audioPath = audioPath;
+
+    }
+
+    public static boolean isTextFile(String path) {
 
         return path.contains(".txt");
+
     }
 
 
-    private boolean isAudiotFile(String path) {
+    public static boolean isAudiotFile(String path) {
 
         return path.contains(".mp3");
     }
 
 
-    private boolean isJsonFile(String path) {
+    public static boolean isJsonFile(String path) {
 
         return path.contains(".json");
     }

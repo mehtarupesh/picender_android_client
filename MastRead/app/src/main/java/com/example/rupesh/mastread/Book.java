@@ -23,7 +23,7 @@ public class Book {
 
     Book(String name, int length) {
         this.name = name;
-        pages = new ArrayList<>();
+        pages = new ArrayList<>(length);
         /* page numbering starts from 1 */
         range = new Range(1, length);
 
@@ -34,7 +34,7 @@ public class Book {
     }
 
     /* path format = *page_<number>.<file_format> */
-    private int getPageNumber(String path) {
+    public static int getPageNumber(String path) {
 
         int indexOfUnderScore = path.lastIndexOf("_");
         int indexOfDot = path.lastIndexOf(".");
@@ -47,7 +47,7 @@ public class Book {
             return -1;
     }
 
-    private Page getPage(int pageNumber) {
+    public Page getPage(int pageNumber) {
         for (int i = 0; i < pages.size(); i++) {
             if (pages.get(i).getNumber() == pageNumber)
                 return pages.get(i);
@@ -67,10 +67,11 @@ public class Book {
             boolean newPage = false;
 
             if (p == null) {
-                p = new Page(pageNumber);
+                p = new Page(name, pageNumber);
                 newPage = true;
             }
 
+            Log.d(TAG, "adding page resource = " + pathToResource);
             p.addData(pathToResource);
 
             if (newPage)

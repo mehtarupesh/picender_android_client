@@ -175,10 +175,12 @@ public class CameraActivity extends AppCompatActivity implements OCRCallback {
             mrUIRunnableBitmap = mrImageBitMap;
             runOnUiThread(mrUIRunnable);
 
-            Log.d(TAG, "going to playback!\n");
-            Intent intent = new Intent(CameraActivity.this, PlayBackActivity.class);
-            intent.putExtra("PAGE_INFO", ret);
-            startActivity(intent);
+            if (ret.getAudioIsOnDevice()) {
+                Log.d(TAG, "cme says audio file exists, going to playback!\n");
+                Intent intent = new Intent(CameraActivity.this, PlayBackActivity.class);
+                intent.putExtra("PAGE_INFO", ret);
+                startActivity(intent);
+            }
 
         } else {
 

@@ -1,9 +1,11 @@
 package com.example.rupesh.mastread;
 
+import java.io.Serializable;
+
 /**
  * Created by rupesh on 10/25/17.
  */
-public class TextBook extends Book {
+public class TextBook extends Book implements Serializable {
 
     private String mBoard;
     private String mMedium;

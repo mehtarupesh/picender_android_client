@@ -14,12 +14,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -32,13 +34,13 @@ public class MRResource {
 
     //app packaged
     AssetManager assetManager;
-    private final String TAG = "MRResource";
+    private final static String TAG = "MRResource";
 
 
     private DownloadManager mrDm;
     private downloadCallback mrDlCb;
-    private final String serverAddress= "http:192.168.1.6:8888";
-
+    private final String serverAddress= "http:192.168.1.81:8888";
+    private static String rootDownloadDir = null;
 
     public MRResource(Context context, downloadCallback cb) {
 
@@ -47,16 +49,88 @@ public class MRResource {
                 new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         mrDlCb = cb;
 
+        rootDownloadDir = context.getExternalFilesDir(null).getAbsolutePath();
         assetManager = context.getAssets();
     }
 
-    public Long downloadFile(Context context, String filePath) {
+    public static String getAbsoluteFilePath(String relativeFilePath)  {
+
+        assert(rootDownloadDir != null);
+
+        return rootDownloadDir+ "/" + relativeFilePath;
+    }
+
+    public static String readFileToString(String filePath, Boolean isAbsolutePath) {
+
+        if (!isAbsolutePath) {
+            filePath = getAbsoluteFilePath(filePath);
+        }
+
+        File f = new File(filePath);
+        if (!f.exists())
+            return null;
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            InputStream in = new FileInputStream(filePath);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+            String line = null;
+            line = br.readLine();
+
+            /* first line */
+            if (line != null) {
+                sb.append(line);
+                Log.d(TAG, line);
+            }
+
+            /* prepend every other line with a newline char */
+            while ((line = br.readLine()) != null) {
+                sb.append("\n").append(line);
+                Log.d(TAG, line);
+            }
+
+            in.close();
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
+    }
+
+    public static Boolean fileExistsOnDevice(String relativeFilePath) {
+        String absoluteFilePath =  getAbsoluteFilePath(relativeFilePath);
+        File f = new File(absoluteFilePath);
+
+        Log.d(TAG, "Checking for : " + f.getAbsolutePath());
+        //Log.d(TAG, "f.exists = " + f.exists());
+        //Log.d(TAG, "f.length() = " + f.length());
+
+        /* TODO: remove  Page.isJsonFile/isTextFile(f.getAbsolutePath() filter once server has valid data */
+        /* Idea is mp3 files are lazy downloaded when user clicks pic and has page  */
+        if (f.exists() /*&& (f.length() > 0  || Page.isJsonFile(f.getAbsolutePath()) || Page.isTextFile(f.getAbsolutePath()))*/) {
+            Log.d(TAG, "Found!");
+            return true;
+        } else {
+            Log.d(TAG, "Not found, Downloading!");
+            return false;
+        }
+
+    }
+    public Long downloadFile(Context context, String filePath, Boolean ignoreIfExists) {
+
+        if (ignoreIfExists && fileExistsOnDevice(filePath)) {
+                return -1L;
+        }
 
         Uri Download_Uri = Uri.parse(serverAddress +"/" + filePath);
 
         DownloadManager.Request request = new DownloadManager.Request(Download_Uri);
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
         request.setAllowedOverRoaming(false);
+        request.allowScanningByMediaScanner();
         request.setTitle("MastRead Downloading " + filePath);
         request.setDescription("Downloading " + filePath);
         request.setVisibleInDownloadsUi(true);
@@ -76,6 +150,7 @@ public class MRResource {
             String downloadFilePath = DownloadStatus(referenceId);
             File download = new File(downloadFilePath);
             Log.d(TAG, "Downloaded File : " + download.getAbsolutePath());
+            Log.d(TAG, "Size = " + download.length());
 
                 /*try {
                     BufferedReader br = new BufferedReader(new FileReader(download));
@@ -90,7 +165,10 @@ public class MRResource {
                     e.printStackTrace();
                 }*/
 
-                mrDlCb.downloadFinishedCallback(download, referenceId);
+            /* NO duplicates pls...android creates duplicates of original file.txt using new name like file-1.txt. */
+            assert(download.getAbsolutePath().contains("-") == false);
+
+            mrDlCb.downloadFinishedCallback(download, referenceId);
         }
     };
 
@@ -132,7 +210,7 @@ public class MRResource {
             while (keys.hasNext()) {
                 String key = keys.next();
 
-                Log.d(TAG, "key = " + key);
+                //Log.d(TAG, "key = " + key);
                 String components[] = isValidTextBookPath(key);
 
                 if (components != null) {
@@ -140,18 +218,29 @@ public class MRResource {
                     JSONArray jsonArr = (JSONArray) jsonObj.get(key);
 
                     /* TODO: sanity check for .json .txt .mp3 ??*/
+                    /* TODO: allow any directory structure */
                     assert(jsonArr.length() % 3 == 0);
-                    TextBook tBook = new TextBook(components[0], components[1], components[2], components[3], jsonArr.length() / 3);
+
+                    TextBook tBook = null;
+                    if (components.length == 4)
+                        tBook = new TextBook(components[0], components[1], components[2], components[3], jsonArr.length() / 3);
 
 
-                    Log.d(TAG, "values :");
+                    File dummyFile = new File(MRResource.getAbsoluteFilePath(key));
+                    Log.d(TAG, "Creating file - " + dummyFile.getAbsolutePath());
+
+
+                    dummyFile.mkdirs();
+
+
+                    //Log.d(TAG, "values :");
                     for (int i = 0; i < jsonArr.length(); i++) {
                         /* create path folder + filename */
                         tBook.addEntry(key + "/" + jsonArr.get(i).toString());
-                        Log.d(TAG, jsonArr.get(i).toString());
+                        //Log.d(TAG, jsonArr.get(i).toString());
                     }
 
-                    Log.d(TAG, "---------------------------------");
+                    //Log.d(TAG, "---------------------------------");
                     retList.add(tBook);
 
                 } else {
@@ -168,19 +257,20 @@ public class MRResource {
     }
 
 
-    // path style : HACKY : "./BOARD_NAME/MEDIUM_NAME/GRADE/SUBJECT
-    // split by "/" gives 5 individual strings
+    // path style : HACKY : "./BOOKS/BOARD_NAME/MEDIUM_NAME/GRADE/SUBJECT
+    // path style : ./BOOKS/BOOKNAME
+    // split by "/" gives 6 individual strings
     private String[] isValidTextBookPath(String directoryName) {
 
         String[] directory = directoryName.split("/");
         String ret[] = new String[4];
 
         int i;
-        if (directory.length == 5 && directory[0].equals(".")) {
-            for (i = 1; i < directory.length; i++) {
+        if (directory.length == 6 && directory[0].equals(".")) {
+            for (i = 2; i < directory.length; i++) {
                 Log.d(TAG, i + "entry is " + directory[i]);
             }
-            System.arraycopy(directory, 1, ret, 0, ret.length);
+            System.arraycopy(directory, 2, ret, 0, ret.length);
             return ret;
         }
         return null;
@@ -188,12 +278,12 @@ public class MRResource {
 
     private String DownloadStatus(long DownloadId) {
 
-        DownloadManager.Query MusicDownloadQuery = new DownloadManager.Query();
+        DownloadManager.Query downloadQuery = new DownloadManager.Query();
         //set the query filter to our previously Enqueued download
-        MusicDownloadQuery.setFilterById(DownloadId);
+        downloadQuery.setFilterById(DownloadId);
 
         //Query the download manager about downloads that have been requested.
-        Cursor cursor = mrDm.query(MusicDownloadQuery);
+        Cursor cursor = mrDm.query(downloadQuery);
         if (cursor.moveToFirst()) {
 
 
@@ -272,9 +362,9 @@ public class MRResource {
                     break;
             }
 
-            Log.d(TAG,
-                    "Music Download Status:" + "\n" + statusText + "\n" +
-                            reasonText);
+            //Log.d(TAG,
+              //      "Music Download Status:" + "\n" + statusText + "\n" +
+              //              reasonText);
             return filename;
         } else
             return null;
@@ -384,7 +474,6 @@ public class MRResource {
                     b.addMultipleEntries(ret);
                     retList.add(b);
                     Log.d(TAG, b.toString());
-
                 }
             }
 

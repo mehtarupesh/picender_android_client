@@ -10,13 +10,13 @@ import android.util.Log;
  */
 public class MRDbHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 10;
+    public static final int DATABASE_VERSION = 19;
     public static final String DATABASE_NAME = "MastRead.db";
     private final String TAG = "MRDbHelper";
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE VIRTUAL TABLE " + MRDbContract.MRDbEntry.TABLE_NAME + " USING fts4(" +
-                    MRDbContract.MRDbEntry._ID + " INTEGER PRIMARY KEY," +
+                    /*MRDbContract.MRDbEntry._ID + " INTEGER PRIMARY KEY," +*/
                     MRDbContract.MRDbEntry.COLUMN_NAME_BOOK_ID + " TEXT," +
                     MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_NUMBER + " INTEGER," +
                     MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_TEXT + " TEXT," +
