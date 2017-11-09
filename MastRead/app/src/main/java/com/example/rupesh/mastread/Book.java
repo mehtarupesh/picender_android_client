@@ -12,6 +12,15 @@ public class Book {
     private String name;
     private Range range;
     private final String TAG = "Book";
+    private String resourceId;
+
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
 
     public String getName() {
         return name;
@@ -21,16 +30,17 @@ public class Book {
         return pages;
     }
 
-    Book(String name, int length) {
+    Book(String name, String resId, int length) {
         this.name = name;
+        this.resourceId = resId;
         pages = new ArrayList<>(length);
         /* page numbering starts from 1 */
         range = new Range(1, length);
 
     }
 
-    Book(String name) {
-        this(name, 50);
+    Book(String name, String resId) {
+        this(name, resId, 50);
     }
 
     /* path format = *page_<number>.<file_format> */

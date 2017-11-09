@@ -5,10 +5,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-
-import java.util.List;
-
 /**
  * Created by rupesh on 5/8/17.
  */
@@ -122,6 +118,10 @@ public class TextViewDisplayEngine {
 
     }
 
+    public void clear() {
+
+        textView.setText("");
+    }
 
     private int range = 5;
     public void printFrame(int handle) {

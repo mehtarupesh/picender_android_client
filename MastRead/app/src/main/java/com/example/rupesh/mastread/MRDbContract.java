@@ -19,6 +19,8 @@ public final class MRDbContract {
         public static final String COLUMN_NAME_BOARD = "board";
         public static final String COLUMN_NAME_MEDIUM = "medium";
         public static final String COLUMN_NAME_GRADE = "grade";
+        public static final String COLUMN_NAME_RESOURCE_ID = "resource_id";
+
 
         //TODO: Linked tables if perf hit.
         //public static final String TABLE_NAME_FTS = "mastread_fts";

@@ -222,15 +222,15 @@ public class MRResource {
                     assert(jsonArr.length() % 3 == 0);
 
                     TextBook tBook = null;
-                    if (components.length == 4)
-                        tBook = new TextBook(components[0], components[1], components[2], components[3], jsonArr.length() / 3);
-
 
                     File dummyFile = new File(MRResource.getAbsoluteFilePath(key));
                     Log.d(TAG, "Creating file - " + dummyFile.getAbsolutePath());
-
-
                     dummyFile.mkdirs();
+
+                    if (components.length == 4)
+                        tBook = new TextBook(components[0], components[1], components[2], components[3], dummyFile.getAbsolutePath(), jsonArr.length() / 3);
+
+
 
 
                     //Log.d(TAG, "values :");
@@ -470,7 +470,7 @@ public class MRResource {
                 if (rPaths[i].contains("mast_read_book") && (folderContents = isValidResource(rPaths[i])) != null) {
                     String[] ret = copy_to_destination_folder(rPaths[i], folderContents, dstRoot);
 
-                    Book b = new Book(rPaths[i]);
+                    Book b = new Book(rPaths[i], rPaths[i]);
                     b.addMultipleEntries(ret);
                     retList.add(b);
                     Log.d(TAG, b.toString());

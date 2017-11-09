@@ -25,13 +25,18 @@ public class MRDbHelper extends SQLiteOpenHelper {
                     MRDbContract.MRDbEntry.COLUMN_NAME_TEXT_PATH + " TEXT," +
                     MRDbContract.MRDbEntry.COLUMN_NAME_BOARD + " TEXT," +
                     MRDbContract.MRDbEntry.COLUMN_NAME_MEDIUM + " TEXT," +
-                    MRDbContract.MRDbEntry.COLUMN_NAME_GRADE + " TEXT)";
+                    MRDbContract.MRDbEntry.COLUMN_NAME_GRADE + " TEXT," +
+                    MRDbContract.MRDbEntry.COLUMN_NAME_RESOURCE_ID + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + MRDbContract.MRDbEntry.TABLE_NAME;
 
     public static final String SQL_SEARCH_STRING =
             "SELECT * FROM " +  MRDbContract.MRDbEntry.TABLE_NAME + " WHERE " + MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_TEXT + " MATCH ?";
+
+    public static final String SQL_SEARCH_STRING_OPTIMIZED =
+            "SELECT * FROM " +  MRDbContract.MRDbEntry.TABLE_NAME + " WHERE " + MRDbContract.MRDbEntry.COLUMN_NAME_PAGE_TEXT + " MATCH ? AND " + MRDbContract.MRDbEntry.COLUMN_NAME_RESOURCE_ID + "=?";
+
 
     public MRDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

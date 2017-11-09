@@ -8,12 +8,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     String TAG = "MainActivity";
     ContentManagementEngine mrCme;
-    MRNetworkEngine mrNe;
+    public static String RESOURCE_ID = "RES_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +23,34 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Bundle b = getIntent().getExtras();
+
         mrCme = ContentManagementEngine.getContentManagementEngine(getApplicationContext());
-        //mrNe = new MRNetworkEngine(getApplicationContext());
+
+
+        if (b != null) {
+            String resource_id = b.getString(MainActivity.RESOURCE_ID);
+
+            if (resource_id != null) {
+                Log.d(TAG, "Received signal to download res_id = " + resource_id);
+                mrCme.setCurrentResourceId(resource_id);
+                mrCme.downloadTextBookWithoutAudio(getApplicationContext(), resource_id);
+            }
+        }
+
+        if (mrCme.getCurrentResourceId() != null) {
+            String[] components = mrCme.getCurrentResourceId().split("/");
+            int len = components.length;
+
+            String displayText = "<Book name>";
+
+            if (len > 0)
+                displayText = components[len - 1];
+
+            Log.d(TAG, "Display Text = " + displayText);
+            ((TextView) findViewById(R.id.textView3)).setText(displayText);
+        }
     }
 
     @Override
@@ -32,16 +60,14 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void playBackAudio(View view) {
-        Log.d(TAG, "going to playback!\n");
-        Intent intent = new Intent(MainActivity.this, PlayBackActivity.class);
-        startActivity(intent);
-    }
-
     public void cameraCapture(View view) {
         Log.d(TAG, "capturing image");
-        Intent intent = new Intent(MainActivity.this, CameraActivity.class);
-        startActivity(intent);
+        if (mrCme.getCurrentResourceId() != null) {
+            Intent intent = new Intent(MainActivity.this, CameraActivity.class);
+            startActivity(intent);
+        } else {
+            Toast.makeText(view.getContext(), "Please Select TextBook to MastRead", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void serverDLTest(View view) {
@@ -60,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
 */
 
-        String bookDir = MRResource.getAbsoluteFilePath("BOOKS");
+        String bookDir = MRResource.getAbsoluteFilePath("./BOOKS");
         Intent intent = new Intent(getApplicationContext(), BookBrowser.class);
         intent.putExtra(BookBrowser.TOKEN, bookDir);
         getApplicationContext().startActivity(intent);

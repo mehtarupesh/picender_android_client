@@ -167,7 +167,7 @@ public class CameraActivity extends AppCompatActivity implements OCRCallback {
         //Log.d(TAG, "------------------------- Recognized text length - " + ocrText.length());
 
         Log.d(TAG, "Doing OCR search");
-        Page ret = mrCme.search(ocrText);
+        Page ret = mrCme.searchOptimized(ocrText);
 
         if (ret != null) {
             Log.d(TAG, "FOUND PAGE!!\n " + ret.toString());

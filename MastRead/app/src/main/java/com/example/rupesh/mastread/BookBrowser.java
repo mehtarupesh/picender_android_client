@@ -80,17 +80,18 @@ public class BookBrowser extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
 
                         switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:
+                            case DialogInterface.BUTTON_NEGATIVE:
                                 Log.d(TAG, "Downloading ...  " + curFile.getName());
 
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.putExtra(MainActivity.RESOURCE_ID, curFile.getAbsolutePath());
                                 getApplicationContext().startActivity(intent);
 
                                 //Yes button clicked
                                 break;
 
-                            case DialogInterface.BUTTON_NEGATIVE:
+                            case DialogInterface.BUTTON_POSITIVE:
                                 finish();
                                 //No button clicked
                                 break;
@@ -98,9 +99,17 @@ public class BookBrowser extends AppCompatActivity {
                     }
                 };
 
+                String[] components = curFile.getAbsolutePath().split("/");
+                int len = components.length;
+
+                String displayText = curFile.getAbsolutePath();
+
+                if (len > 0)
+                    displayText = components[len - 1];
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Are you sure you want to download this book?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
+                builder.setMessage("Select " + displayText + " ?").setPositiveButton("Cancel", dialogClickListener)
+                        .setNegativeButton("OK", dialogClickListener).show();
 
             }
         }

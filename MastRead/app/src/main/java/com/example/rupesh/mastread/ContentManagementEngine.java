@@ -3,6 +3,7 @@ package com.example.rupesh.mastread;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class ContentManagementEngine implements downloadCallback {
     private TextBook currentTextBook;
     private TextBook currentTextBookFocus;
     private Context mrContext;
+    private static String currentResourceId;
 
 
     private static boolean searchInProgress;
@@ -59,9 +61,17 @@ public class ContentManagementEngine implements downloadCallback {
         return mrCme;
     }
 
-    public void downloadTextBookWithoutAudio(Context context, String board, String medium, String grade, String bookName) {
+    public static String getCurrentResourceId() {
+        return currentResourceId;
+    }
 
-        ArrayList<String> textBookFiles = mrDb.getTextBookFiles(board, medium, grade, bookName);
+    public static void setCurrentResourceId(String currentResourceId) {
+        ContentManagementEngine.currentResourceId = currentResourceId;
+    }
+
+    public void downloadTextBookWithoutAudio(Context context, String board, String medium, String grade, String bookName, String resId) {
+
+        ArrayList<String> textBookFiles = mrDb.getTextBookFiles(board, medium, grade, bookName, resId);
 
         if (textBookFiles.size() > 0) {
 
@@ -70,7 +80,7 @@ public class ContentManagementEngine implements downloadCallback {
                 /* only one textbook at a time ? */
                 if (currentTextBookDownloadBundle.size() == 0) {
 
-                    currentTextBook = new TextBook(board, medium, grade, bookName);
+                    currentTextBook = new TextBook(board, medium, grade, bookName, resId);
 
                     for (int i = 0; i < textBookFiles.size(); i++) {
                         String dlFile = textBookFiles.get(i);
@@ -88,6 +98,37 @@ public class ContentManagementEngine implements downloadCallback {
         }
 
     }
+
+    public void downloadTextBookWithoutAudio(Context context, String resId) {
+
+        ArrayList<String> textBookFiles = mrDb.getTextBookFiles(resId);
+
+        if (textBookFiles.size() > 0) {
+
+            synchronized (currentTextBookDownloadBundle) {
+
+                /* only one textbook at a time ? */
+                if (currentTextBookDownloadBundle.size() == 0) {
+
+                    currentTextBook = new TextBook(null, null, null, null, resId);
+
+                    for (int i = 0; i < textBookFiles.size(); i++) {
+                        String dlFile = textBookFiles.get(i);
+                        if (!Page.isAudiotFile(dlFile) && !mrResource.fileExistsOnDevice(dlFile)) {
+                            Long ret = mrResource.downloadFile(context, dlFile, true);
+
+                            Log.d(TAG, "added for download refid = " + ret);
+                            if (ret > 0) {
+                                currentTextBookDownloadBundle.add(ret);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     public void startSearch() {
         searchInProgress = true;
         searchQuery = null;
@@ -143,7 +184,7 @@ public class ContentManagementEngine implements downloadCallback {
                 if (ret != null) {
                     assert(ret.getPages().size() == 0);
 
-                    ArrayList<String> textBookFiles = mrDb.getTextBookFiles(ret.getBoard(), ret.getMedium(), ret.getGrade(), ret.getName());
+                    ArrayList<String> textBookFiles = mrDb.getTextBookFiles(ret.getBoard(), ret.getMedium(), ret.getGrade(), ret.getName(), ret.getResourceId());
                     assert(textBookFiles != null);
 
 
@@ -185,6 +226,86 @@ public class ContentManagementEngine implements downloadCallback {
 
         return null;
     }
+
+    public Page searchOptimized(String pageText) {
+        if (searchInProgress == false) {
+            return null;
+        }
+
+        TextBook ret = null;
+        String words[] = pageText.split("\\s+");
+        String searchString = "";
+
+        //TODO: optimizations
+        //long dbEntriesThreshold = mrDb.getNumberofEntries() / 4;
+
+        for (int i = 0; i < words.length; i++) {
+
+            //words[i] = words[i].replaceAll("\n","");
+            //words[i] = words[i].replaceAll("\"","");
+            //words[i] = words[i].replaceAll("\'","");
+            Log.d(TAG, "Unfiltererd word :  " + words[i]);
+
+            words[i] = filterWordForAlphabets(words[i]);
+
+            if (words[i] == null)
+                return null;
+
+            Log.d(TAG, "Checking for word :  " + words[i]);
+
+            int matches = mrDb.wordEntryMatches(words[i]);
+            if (matches > 0) {
+                Log.d(TAG, "Exists..");
+
+                searchString = searchString + ((searchString.length() > 0) ? " AND " : "") + words[i];
+
+                ret = mrDb.searchTextOptimized(searchString, currentResourceId);
+                if (ret != null) {
+                    assert(ret.getPages().size() == 0);
+
+                    ArrayList<String> textBookFiles = mrDb.getTextBookFiles(ret.getResourceId());
+                    assert(textBookFiles != null);
+
+
+                    /* only one page must be added by mrDB */
+                    int pageNumber = ret.getPages().get(0).getNumber();
+
+                    Log.d(TAG, "Board = " + ret.getBoard());
+                    Log.d(TAG, "Medium = " + ret.getMedium());
+                    Log.d(TAG, "Grade = " + ret.getGrade());
+                    Log.d(TAG, "Name = " + ret.getName());
+
+                    Log.d(TAG, "Page #= " + pageNumber);
+                    Log.d(TAG, "Target page = " + ret.getPage(pageNumber).toString());
+
+
+                                            /* check if already exists */
+                    if (MRResource.fileExistsOnDevice(ret.getPage(pageNumber).getAudioPath())) {
+
+                        ret.getPage(pageNumber).setAudioIsOnDevice(true);
+                        return ret.getPage(pageNumber);
+                    }
+
+                    synchronized (currentTextBookDownloadBundle) {
+                        /* signal caller to not call PBA, wait for callback hmmm... */
+                        ret.getPage(pageNumber).setAudioIsOnDevice(false);
+                        currentTextBookFocus = ret;
+                    }
+
+                    mrResource.downloadFile(mrContext, ret.getPage(pageNumber).getAudioPath(), true);
+
+                    return ret.getPage(pageNumber);
+                }
+
+            } else {
+                Log.d(TAG, "Not found...");
+            }
+            Log.d(TAG, "-------------------");
+        }
+
+        return null;
+    }
+
 
     public void endSearch() {
         searchInProgress = false;
@@ -228,7 +349,10 @@ public class ContentManagementEngine implements downloadCallback {
 
                     if (currentTextBookDownloadBundle.isEmpty()) {
                         Log.d(TAG, "Done downloading bundle, adding to DB!!");
-                        mrDb.addPageTextInfo(currentTextBook.getBoard(), currentTextBook.getMedium(), currentTextBook.getGrade(), currentTextBook.getName());
+                        Toast.makeText(mrContext, "Finished downloading " + currentTextBook.getResourceId(), Toast.LENGTH_SHORT).show();
+
+                        //mrDb.addPageTextInfo(currentTextBook.getBoard(), currentTextBook.getMedium(), currentTextBook.getGrade(), currentTextBook.getName());
+                        mrDb.addPageTextInfo(currentTextBook.getResourceId());
                         currentTextBook = null;
                     }
                 }
@@ -242,6 +366,7 @@ public class ContentManagementEngine implements downloadCallback {
                     if (Book.getPageNumber(dlFile.getAbsolutePath()) == currentTextBookFocus.getPages().get(0).getNumber()) {
 
                         Log.d(TAG, "Downloaded audio file, going to playback!\n");
+                        Toast.makeText(mrContext, "Finished downloading Audio !", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(mrContext, PlayBackActivity.class);
                         intent.putExtra("PAGE_INFO", currentTextBookFocus.getPage(pageNumber));
                         mrContext.startActivity(intent);

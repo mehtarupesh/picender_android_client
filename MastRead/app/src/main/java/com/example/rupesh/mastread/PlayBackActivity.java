@@ -206,6 +206,7 @@ public class PlayBackActivity extends AppCompatActivity {
             mrAudioPlayer.setPosition(seekTime);
         }
         mrAudioPlayer.mrPlay();
+        mrTextViewDisplayEngine.clear();
         mrState = playState.PLAYING;
     }
 
