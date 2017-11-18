@@ -1,10 +1,13 @@
 package com.example.rupesh.mastread;
 
+import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -17,12 +20,59 @@ public class PlayBackActivity extends AppCompatActivity {
     private MRSyncWordEngine mrSyncWordEngine;
     private TextViewDisplayEngine mrTextViewDisplayEngine;
     private int focus;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+//    private GoogleApiClient client;
+//
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//
+//        // ATTENTION: This was auto-generated to implement the App Indexing API.
+//        // See https://g.co/AppIndexing/AndroidStudio for more information.
+//        client.connect();
+//        Action viewAction = Action.newAction(
+//                Action.TYPE_VIEW, // TODO: choose an action type.
+//                "PlayBack Page", // TODO: Define a title for the content shown.
+//                // TODO: If you have web page content that matches this app activity's content,
+//                // make sure this auto-generated web page URL is correct.
+//                // Otherwise, set the URL to null.
+//                Uri.parse("http://host/path"),
+//                // TODO: Make sure this auto-generated app deep link URI is correct.
+//                Uri.parse("android-app://com.example.rupesh.mastread/http/host/path")
+//        );
+//        AppIndex.AppIndexApi.start(client, viewAction);
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//
+//        // ATTENTION: This was auto-generated to implement the App Indexing API.
+//        // See https://g.co/AppIndexing/AndroidStudio for more information.
+//        Action viewAction = Action.newAction(
+//                Action.TYPE_VIEW, // TODO: choose an action type.
+//                "PlayBack Page", // TODO: Define a title for the content shown.
+//                // TODO: If you have web page content that matches this app activity's content,
+//                // make sure this auto-generated web page URL is correct.
+//                // Otherwise, set the URL to null.
+//                Uri.parse("http://host/path"),
+//                // TODO: Make sure this auto-generated app deep link URI is correct.
+//                Uri.parse("android-app://com.example.rupesh.mastread/http/host/path")
+//        );
+//        AppIndex.AppIndexApi.end(client, viewAction);
+//        client.disconnect();
+//    }
 
     private enum playState {
         STOPPED,
         PLAYING,
         PAUSED
-    };
+    }
+
+    ;
     private playState mrState = playState.STOPPED;
 
 
@@ -36,7 +86,7 @@ public class PlayBackActivity extends AppCompatActivity {
 
         if (!ret.exists()) {
 
-            Log.d(TAG, "not found : " + path );
+            Log.d(TAG, "not found : " + path);
             ret = null;
         } else {
             Log.d(TAG, "found : " + path);
@@ -51,20 +101,28 @@ public class PlayBackActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        String displayText = "404 : Page not found!";
+        String displayText = "";
         Page page_info = (Page) getIntent().getSerializableExtra("PAGE_INFO");
         File audioFilePath = null;
         File jsonFilePath = null;
         if (page_info != null) {
             Log.d(TAG, "Playing page : \n" + page_info.toString());
-            displayText = page_info.getBookId() + "\n" + "Page number : " + page_info.getNumber();
+
+            if (page_info.getBookId() != null)
+                displayText = page_info.getBookId() + "\n";
+
+            displayText += "Page number : " + page_info.getNumber();
 
             Log.d(TAG, "mp3 played = " + page_info.getAudioPath());
-            Log.d(TAG,"json used = " + page_info.getJsonPath());
+            Log.d(TAG, "json used = " + page_info.getJsonPath());
 
             audioFilePath = getFileFromPath(MRResource.getAbsoluteFilePath(page_info.getAudioPath()));
             jsonFilePath = getFileFromPath(MRResource.getAbsoluteFilePath(page_info.getJsonPath()));
+        } else {
+            displayText = "404 : Page not found!";
         }
 
         /* starting word is index 0 */
@@ -75,10 +133,24 @@ public class PlayBackActivity extends AppCompatActivity {
             Log.d(TAG, "audio file size = " + audioFilePath.length());
             Log.d(TAG, "json file size = " + jsonFilePath.length());
 
-            mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), audioFilePath);
+            /* on completionListener */
+            MediaPlayer.OnCompletionListener listener = new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    Log.d(TAG, "Releasing mediaplayer resources");
+                    togglePlayPauseButton((Button)findViewById(R.id.playButton));
+                    //isLoaded = false;
+                    //mp.release();
+                    //mp.reset();
+                }
+            };
+
+            mrAudioPlayer = new MRAudioPlayer2(getApplicationContext(), audioFilePath, listener);
             mrSyncWordEngine = new MRSyncWordEngine(getApplicationContext(), jsonFilePath);
+            mrTextViewDisplayEngine = new TextViewDisplayEngine((TextView) findViewById(R.id.playBackTextView), mrSyncWordEngine);
+
         } else {
-            displayText += "\nSource Files not found:(";
+            displayText += "\nSource Files not found :(";
             //audioFilePath = new File("/storage/emulated/0/Android/data/com.example.rupesh.mastread/files/./Board1/MediumY/Grade3/mast_read_book_2/page_12.mp3");
             //jsonFilePath = new File("/storage/emulated/0/Android/data/com.example.rupesh.mastread/files/./Board1/MediumY/Grade3/mast_read_book_2/page_12.json");
 
@@ -89,9 +161,11 @@ public class PlayBackActivity extends AppCompatActivity {
             //mrSyncWordEngine = new MRSyncWordEngine(getApplicationContext(), jsonFilePath);
         }
 
-        mrTextViewDisplayEngine = new TextViewDisplayEngine((TextView) findViewById(R.id.textView), mrSyncWordEngine);
-        ((TextView) findViewById(R.id.textView)).setText(displayText);
+        ((TextView) findViewById(R.id.playBackTextView)).setText(displayText);
         Log.d(TAG, "In PBA \n");
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
@@ -100,7 +174,7 @@ public class PlayBackActivity extends AppCompatActivity {
 
         if (mrState == playState.PLAYING) {
             processOnPause();
-            Button playPause = (Button) findViewById(R.id.button2);
+            Button playPause = (Button) findViewById(R.id.playButton);
             //show the next available option
             playPause.setText(getPlayPauseString(mrState));
         }
@@ -136,26 +210,43 @@ public class PlayBackActivity extends AppCompatActivity {
         return ret;
     }
 
-    public void playPauseButton (View view) {
+    private void togglePlayPauseButton(Button playPause) {
+        switch (mrState) {
+            case PLAYING:
+                processOnPause();
+                break;
+            case STOPPED:
+            case PAUSED:
+                processOnPlay();
+                break;
+            default:
+                Log.d(TAG, "unknown state?\n");
+        }
+        //show the next available option
+        playPause.setText(getPlayPauseString(mrState));
+    }
 
-            switch (mrState) {
-                case PLAYING:
-                    processOnPause();
-                    break;
-                case STOPPED:
-                case PAUSED:
-                    processOnPlay();
-                    break;
-                default:
-                    Log.d(TAG, "unknown state?\n");
-            }
-            Button playPause = (Button) view;
-            //show the next available option
-            playPause.setText(getPlayPauseString(mrState));
+    public void playPauseButton(View view) {
+
+        togglePlayPauseButton((Button)view);
+        /*switch (mrState) {
+            case PLAYING:
+                processOnPause();
+                break;
+            case STOPPED:
+            case PAUSED:
+                processOnPlay();
+                break;
+            default:
+                Log.d(TAG, "unknown state?\n");
+        }
+        Button playPause = (Button) view;
+        //show the next available option
+        playPause.setText(getPlayPauseString(mrState));*/
 
     }
 
-    public void forwardButton (View view) {
+    public void forwardButton(View view) {
 
         /* if paused, use as word selector */
         if (mrState == playState.PAUSED) {
@@ -180,7 +271,7 @@ public class PlayBackActivity extends AppCompatActivity {
     }
 
 
-    public void backwardButton (View view) {
+    public void backwardButton(View view) {
 
         if (mrState == playState.PAUSED) {
             int handle;
@@ -206,7 +297,7 @@ public class PlayBackActivity extends AppCompatActivity {
             mrAudioPlayer.setPosition(seekTime);
         }
         mrAudioPlayer.mrPlay();
-        mrTextViewDisplayEngine.clear();
+        mrTextViewDisplayEngine.onPlay();
         mrState = playState.PLAYING;
     }
 
@@ -220,6 +311,8 @@ public class PlayBackActivity extends AppCompatActivity {
         int currentTime = mrAudioPlayer.getCurrentPosition();
         int handle = mrSyncWordEngine.getHandleFromTimeStamp(currentTime);
         mrTextViewDisplayEngine.printFrame(handle);
+
+        mrTextViewDisplayEngine.onPause();
         mrTextViewDisplayEngine.display(handle);
         focus = -1;
     }

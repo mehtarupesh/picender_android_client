@@ -39,7 +39,7 @@ public class MRResource {
 
     private DownloadManager mrDm;
     private downloadCallback mrDlCb;
-    private final String serverAddress= "http:192.168.1.81:8888";
+    private final String serverAddress= "http:192.168.2.103:8888";
     private static String rootDownloadDir = null;
 
     public MRResource(Context context, downloadCallback cb) {
@@ -228,7 +228,7 @@ public class MRResource {
                     dummyFile.mkdirs();
 
                     if (components.length == 4)
-                        tBook = new TextBook(components[0], components[1], components[2], components[3], dummyFile.getAbsolutePath(), jsonArr.length() / 3);
+                        tBook = new TextBook(components[0], components[1], components[2], components[3], dummyFile.getAbsolutePath(), 200);
 
 
 
@@ -236,6 +236,7 @@ public class MRResource {
                     //Log.d(TAG, "values :");
                     for (int i = 0; i < jsonArr.length(); i++) {
                         /* create path folder + filename */
+                        Log.d(TAG, "adding -- " + key + "/" + jsonArr.get(i).toString());
                         tBook.addEntry(key + "/" + jsonArr.get(i).toString());
                         //Log.d(TAG, jsonArr.get(i).toString());
                     }

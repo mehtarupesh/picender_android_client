@@ -22,7 +22,7 @@ public class ContentManagementEngine implements downloadCallback {
     private final String serverFileList = "filelist.mastread";
     private List<Long> currentTextBookDownloadBundle;
     private TextBook currentTextBook;
-    private TextBook currentTextBookFocus;
+    private Page currentPageFocus;
     private Context mrContext;
     private static String currentResourceId;
 
@@ -38,17 +38,7 @@ public class ContentManagementEngine implements downloadCallback {
         mrDb = new MRDb(context);
         currentTextBookDownloadBundle = Collections.synchronizedList(new ArrayList<Long>());
         currentTextBook = null;
-        currentTextBookFocus = null;
-
-        /*ArrayList<Book> bookList = mrResource.fetchResources(context.getExternalFilesDir(null).getAbsolutePath());
-
-        mrDb = new MRDb(context);
-        Log.d(TAG, "Num DB entries = " + mrDb.getNumberofEntries());
-        for (int i = 0; i < bookList.size(); i++) {
-            Book b = bookList.get(i);
-            mrDb.addEntry(b);
-            mrDb.printBookInfo(b.getName());
-        }*/
+        currentPageFocus = null;
 
         searchInProgress = false;
     }
@@ -129,6 +119,10 @@ public class ContentManagementEngine implements downloadCallback {
 
     }
 
+    public TextBook getTextBook(String resId) {
+        return mrDb.getTextBook(resId);
+    }
+
     public void startSearch() {
         searchInProgress = true;
         searchQuery = null;
@@ -200,22 +194,24 @@ public class ContentManagementEngine implements downloadCallback {
                     Log.d(TAG, "Target page = " + ret.getPage(pageNumber).toString());
 
 
+                    return processPageRequest(ret, pageNumber);
+
                                             /* check if already exists */
-                    if (MRResource.fileExistsOnDevice(ret.getPage(pageNumber).getAudioPath())) {
-
-                        ret.getPage(pageNumber).setAudioIsOnDevice(true);
-                        return ret.getPage(pageNumber);
-                    }
-
-                    synchronized (currentTextBookDownloadBundle) {
-                        /* signal caller to not call PBA, wait for callback hmmm... */
-                        ret.getPage(pageNumber).setAudioIsOnDevice(false);
-                        currentTextBookFocus = ret;
-                    }
-
-                    mrResource.downloadFile(mrContext, ret.getPage(pageNumber).getAudioPath(), true);
-
-                    return ret.getPage(pageNumber);
+//                    if (MRResource.fileExistsOnDevice(ret.getPage(pageNumber).getAudioPath())) {
+//
+//                        ret.getPage(pageNumber).setAudioIsOnDevice(true);
+//                        return ret.getPage(pageNumber);
+//                    }
+//
+//                    synchronized (currentTextBookDownloadBundle) {
+//                        /* signal caller to not call PBA, wait for callback hmmm... */
+//                        ret.getPage(pageNumber).setAudioIsOnDevice(false);
+//                        currentPageFocus = ret.getPage(pageNumber);
+//                    }
+//
+//                    downloadFile(ret.getPage(pageNumber).getAudioPath(), true);
+//
+//                    return ret.getPage(pageNumber);
                 }
 
             } else {
@@ -248,6 +244,10 @@ public class ContentManagementEngine implements downloadCallback {
 
             words[i] = filterWordForAlphabets(words[i]);
 
+
+            if (words[i].length() < 2)
+                continue;
+
             if (words[i] == null)
                 return null;
 
@@ -258,6 +258,8 @@ public class ContentManagementEngine implements downloadCallback {
                 Log.d(TAG, "Exists..");
 
                 searchString = searchString + ((searchString.length() > 0) ? " AND " : "") + words[i];
+
+                Log.d(TAG, "search string = " + searchString);
 
                 ret = mrDb.searchTextOptimized(searchString, currentResourceId);
                 if (ret != null) {
@@ -279,22 +281,23 @@ public class ContentManagementEngine implements downloadCallback {
                     Log.d(TAG, "Target page = " + ret.getPage(pageNumber).toString());
 
 
+                    return processPageRequest(ret, pageNumber);
                                             /* check if already exists */
-                    if (MRResource.fileExistsOnDevice(ret.getPage(pageNumber).getAudioPath())) {
-
-                        ret.getPage(pageNumber).setAudioIsOnDevice(true);
-                        return ret.getPage(pageNumber);
-                    }
-
-                    synchronized (currentTextBookDownloadBundle) {
-                        /* signal caller to not call PBA, wait for callback hmmm... */
-                        ret.getPage(pageNumber).setAudioIsOnDevice(false);
-                        currentTextBookFocus = ret;
-                    }
-
-                    mrResource.downloadFile(mrContext, ret.getPage(pageNumber).getAudioPath(), true);
-
-                    return ret.getPage(pageNumber);
+//                    if (MRResource.fileExistsOnDevice(ret.getPage(pageNumber).getAudioPath())) {
+//
+//                        ret.getPage(pageNumber).setAudioIsOnDevice(true);
+//                        return ret.getPage(pageNumber);
+//                    }
+//
+//                    synchronized (currentTextBookDownloadBundle) {
+//                        /* signal caller to not call PBA, wait for callback hmmm... */
+//                        ret.getPage(pageNumber).setAudioIsOnDevice(false);
+//                        currentPageFocus = ret.getPage(pageNumber);
+//                    }
+//
+//                    downloadFile(ret.getPage(pageNumber).getAudioPath(), true);
+//
+//                    return ret.getPage(pageNumber);
                 }
 
             } else {
@@ -306,6 +309,29 @@ public class ContentManagementEngine implements downloadCallback {
         return null;
     }
 
+    public Page processPageRequest(TextBook tBook, int pageNumber) {
+                                          /* check if already exists */
+        if (MRResource.fileExistsOnDevice(tBook.getPage(pageNumber).getAudioPath())) {
+
+            tBook.getPage(pageNumber).setAudioIsOnDevice(true);
+            return tBook.getPage(pageNumber);
+        }
+
+        synchronized (currentTextBookDownloadBundle) {
+                        /* signal caller to not call PBA, wait for callback hmmm... */
+            tBook.getPage(pageNumber).setAudioIsOnDevice(false);
+            currentPageFocus = tBook.getPage(pageNumber);
+        }
+
+        downloadFile(tBook.getPage(pageNumber).getAudioPath(), true);
+
+        return tBook.getPage(pageNumber);
+
+    }
+
+    public Long downloadFile(String path, Boolean ignoreIfExists) {
+        return mrResource.downloadFile(mrContext, path, ignoreIfExists);
+    }
 
     public void endSearch() {
         searchInProgress = false;
@@ -357,18 +383,18 @@ public class ContentManagementEngine implements downloadCallback {
                     }
                 }
 
-                if (currentTextBookFocus != null) {
+                if (currentPageFocus != null) {
 
                     int pageNumber = Book.getPageNumber(dlFile.getAbsolutePath());
                     Log.d(TAG, "dl page number =" + pageNumber);
-                    Log.d(TAG, "currentTextBookFocus page number = " + currentTextBookFocus.getPages().get(0).getNumber());
+                    Log.d(TAG, "currentPageFocus page number = " + currentPageFocus.getNumber());
 
-                    if (Book.getPageNumber(dlFile.getAbsolutePath()) == currentTextBookFocus.getPages().get(0).getNumber()) {
+                    if (Book.getPageNumber(dlFile.getAbsolutePath()) == currentPageFocus.getNumber()) {
 
                         Log.d(TAG, "Downloaded audio file, going to playback!\n");
                         Toast.makeText(mrContext, "Finished downloading Audio !", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(mrContext, PlayBackActivity.class);
-                        intent.putExtra("PAGE_INFO", currentTextBookFocus.getPage(pageNumber));
+                        intent.putExtra("PAGE_INFO", currentPageFocus);
                         mrContext.startActivity(intent);
                     }
 

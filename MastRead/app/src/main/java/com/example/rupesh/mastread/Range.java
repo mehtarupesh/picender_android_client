@@ -33,4 +33,9 @@ public class Range {
         }
         return false;
     }
+
+    public String printRange() {
+
+        return "[" + start + "]" + " to " + "[" + end + "]";
+    }
 }

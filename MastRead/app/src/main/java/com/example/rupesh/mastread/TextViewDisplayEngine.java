@@ -1,5 +1,6 @@
 package com.example.rupesh.mastread;
 
+import android.graphics.Color;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
@@ -19,18 +20,22 @@ public class TextViewDisplayEngine {
 
         if (inCurrentFrame(handle)) {
 
+            Log.d(TAG, "reset: In current frame");
             return;
 
         } else if(inPreviousFrame(handle)) {
 
+            Log.d(TAG, "reset : In prev frame");
             currentFrame = getDummyFramePrevious(currentFrame);
 
         } else if (inNextFrame(handle)) {
 
+            Log.d(TAG, "reset : In next frame");
             currentFrame = getDummyFrameNext(currentFrame);
 
         } else {
 
+            Log.d(TAG, "reset : setting start = -1, end = -1");
             currentFrame.setStart(-1);
             currentFrame.setEnd(-1);
 
@@ -75,7 +80,9 @@ public class TextViewDisplayEngine {
     }
     public Boolean display(int handle) {
 
+        Log.d(TAG, "display handle : " + handle);
         Range r = getDummyFrame(handle);
+        Log.d(TAG, "display : dummy frame = " + r.printRange());
 
         if (r.getStart() == -1 || r.getEnd() == -1) {
             return false;
@@ -89,6 +96,8 @@ public class TextViewDisplayEngine {
         } else {
             currentFrame = r;
         }
+
+        Log.d(TAG, "currentframe before loop = " + r.printRange());
         /* Display interval */
         String buffer = "";
         for (int i = r.getStart(); i <= r.getEnd(); i++) {
@@ -99,7 +108,7 @@ public class TextViewDisplayEngine {
             else
                 buffer +=  word;
 
-            if (!isPunctuation(mrSyncWordEngine.getWordFromHandle(i + 1))) {
+            if (r.inRange(i+1) && !isPunctuation(mrSyncWordEngine.getWordFromHandle(i + 1))) {
                 buffer += " ";
             }
         }
@@ -118,9 +127,19 @@ public class TextViewDisplayEngine {
 
     }
 
-    public void clear() {
+    public void onPlay() {
 
-        textView.setText("");
+        textView.setGravity(Gravity.CENTER);
+        textView.setText("READ TEXTBOOK !");
+        textView.setBackgroundColor(Color.YELLOW);
+        textView.setTextColor(Color.RED);
+
+    }
+
+    public void onPause() {
+
+        textView.setBackgroundColor(Color.WHITE);
+        textView.setTextColor(Color.BLACK);
     }
 
     private int range = 5;
@@ -142,9 +161,9 @@ public class TextViewDisplayEngine {
 
         for (int i = start; i <= end; i++) {
             if (i == handle) {
-                Log.d(TAG, "HIGHLIGHT!!! - " + mrSyncWordEngine.getWordFromHandle(i));
+                Log.d(TAG, "index = " + i + ", HIGHLIGHT!!! - " + mrSyncWordEngine.getWordFromHandle(i));
             } else
-                Log.d(TAG, "word -" + mrSyncWordEngine.getWordFromHandle(i));
+                Log.d(TAG, "index = " + i + ", word -" + mrSyncWordEngine.getWordFromHandle(i));
         }
 
         Log.d(TAG, "-------------------------------------\n");
@@ -178,7 +197,7 @@ public class TextViewDisplayEngine {
         int end = handle + range;
 
         if (end >= mrSyncWordEngine.getLength())
-            end = 0;
+            end = mrSyncWordEngine.getLength() - 1;
 
         return end;
 

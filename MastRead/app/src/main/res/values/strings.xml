@@ -4,4 +4,5 @@
     <string name="title_activity_play_back">PlayBackActivity</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_book_browser">BookBrowser</string>
+    <string name="title_activity_page_browser">PageBrowser</string>
 </resources>

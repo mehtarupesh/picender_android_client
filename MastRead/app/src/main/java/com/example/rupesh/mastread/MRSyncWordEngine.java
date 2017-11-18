@@ -113,8 +113,9 @@ public class MRSyncWordEngine {
     /* round it up i.e to the next whole word */
     public int getHandleFromTimeStamp(int ts) {
         int ret = -1;
+        int i;
 
-        for (int i = 0; i < wordSyncArray.length(); i++) {
+        for (i = 0; i < wordSyncArray.length(); i++) {
             try {
 
                 if (!jsonFormat.isValidEntry(wordSyncArray.getJSONObject(i))) {
@@ -128,7 +129,16 @@ public class MRSyncWordEngine {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
 
+        /* handle case when audio has stopped */
+        int lastEntryIndex = i - 1;
+        try {
+            if (ts > jsonFormat.getEndTime((wordSyncArray.getJSONObject(lastEntryIndex)))) {
+                return lastEntryIndex;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         return ret;

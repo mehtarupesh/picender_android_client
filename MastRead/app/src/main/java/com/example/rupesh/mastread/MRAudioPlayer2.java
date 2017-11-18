@@ -41,8 +41,9 @@ public class MRAudioPlayer2 {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 Log.d(TAG, "Releasing mediaplayer resources");
-                isLoaded = false;
-                mp.release();
+                //isLoaded = false;
+                //mp.release();
+                //mp.reset();
             }
         });
 
@@ -71,6 +72,52 @@ public class MRAudioPlayer2 {
             return;
         }
         initMediaPlayer();
+    }
+
+    private void initMediaPlayer(MediaPlayer.OnCompletionListener listener) {
+
+        assert (mediaPlayer != null);
+
+        isLoaded = true;
+        Log.d(TAG, "MRAudioPlayer2 create DONE!\n");
+
+        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                Log.d(TAG, "onError called with error type = " + what);
+                Log.d(TAG, "onError called with extra info = " + extra);
+                isLoaded = false;
+                return false;
+            }
+        });
+
+        mediaPlayer.setOnCompletionListener(listener);
+
+        currentPlayBackRate = 1.0f;
+    }
+
+    public MRAudioPlayer2(Context context,
+                          File file, MediaPlayer.OnCompletionListener listener) {
+
+        mediaPlayer = MediaPlayer.create(context, Uri.fromFile(file));
+
+        if (mediaPlayer == null) {
+            Log.d(TAG, "MRAudioPlayer2 create FAILED!\n");
+            return;
+        }
+        initMediaPlayer(listener);
+    }
+
+    public MRAudioPlayer2(Context context,
+                          int resId, MediaPlayer.OnCompletionListener listener) {
+
+        mediaPlayer = MediaPlayer.create(context, resId);
+
+        if (mediaPlayer == null) {
+            Log.d(TAG, "MRAudioPlayer2 create FAILED!\n");
+            return;
+        }
+        initMediaPlayer(listener);
     }
 
     public void mrPlay() {
@@ -103,7 +150,7 @@ public class MRAudioPlayer2 {
     }
 
     public void mrIncrementPlayBackRate() {
-        if (currentPlayBackRate + playBackdelta <= maxPlayBackRate) {
+        if (currentPlayBackRate + playBackdelta < maxPlayBackRate) {
             currentPlayBackRate += playBackdelta;
             this.mrSetRate(currentPlayBackRate);
         }
@@ -130,6 +177,8 @@ public class MRAudioPlayer2 {
         }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+
+            Log.d(TAG, "Setting rate to " + rate);
             PlaybackParams params = mediaPlayer.getPlaybackParams();
             params.setSpeed(rate);
             mediaPlayer.setPlaybackParams(params);

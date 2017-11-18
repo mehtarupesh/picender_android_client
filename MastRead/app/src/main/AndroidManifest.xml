@@ -43,7 +43,16 @@
         <activity
             android:name=".BookBrowser"
             android:label="@string/title_activity_book_browser"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PageBrowser"
+            android:label="@string/title_activity_page_browser"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+             App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

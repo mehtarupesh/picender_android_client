@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/textView"
+        android:id="@+id/playBackTextView"
         android:layout_marginTop="59dp"
         android:width="500dp"
         android:layout_alignParentTop="true"
@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="play"
-        android:id="@+id/button2"
+        android:id="@+id/playButton"
         android:onClick="playPauseButton"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -36,17 +36,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="&lt;&lt;"
-        android:id="@+id/button3"
+        android:id="@+id/backButton"
         android:onClick="backwardButton"
-        android:layout_alignTop="@+id/button2"
+        android:layout_alignTop="@+id/playButton"
         android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=">>"
-        android:id="@+id/button4"
+        android:id="@+id/frontButton"
         android:onClick="forwardButton"
-        android:layout_alignTop="@+id/button2"
+        android:layout_alignTop="@+id/playButton"
         android:layout_alignParentEnd="true" />
 </RelativeLayout>

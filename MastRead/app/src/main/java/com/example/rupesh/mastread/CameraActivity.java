@@ -1,6 +1,7 @@
 package com.example.rupesh.mastread;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,6 +41,8 @@ public class CameraActivity extends AppCompatActivity implements OCRCallback {
         mrImageView = (ImageView)findViewById(R.id.imageView);
         storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         mrSubImagesBitMap = new ArrayList<>();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         mrCme = ContentManagementEngine.getContentManagementEngine(getApplicationContext());
 
         mrOCR = new OCR(storageDir.getAbsolutePath(), getApplicationContext(), this);

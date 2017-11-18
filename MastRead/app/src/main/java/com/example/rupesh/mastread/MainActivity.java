@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
 
         mrCme = ContentManagementEngine.getContentManagementEngine(getApplicationContext());
+        Button camCapture = (Button)findViewById(R.id.camCaptureButton);
+        Button pageSelect = (Button)findViewById(R.id.selectPageButton);
 
 
         if (b != null) {
@@ -43,13 +46,30 @@ public class MainActivity extends AppCompatActivity {
             String[] components = mrCme.getCurrentResourceId().split("/");
             int len = components.length;
 
-            String displayText = "<Book name>";
+            String displayText = "<Please Select Book>";
 
-            if (len > 0)
-                displayText = components[len - 1];
+            if (len > 0) {
 
+                displayText = "";
+                Boolean parseText = false;
+                for (int i = 0; i < len; i++) {
+
+                    if (components[i].compareTo("BOOKS") == 0) {
+                        parseText = true;
+                    }
+                    else if (parseText == true) {
+                        displayText = displayText + components[i] + "\n";
+                    }
+                }
+            }
             Log.d(TAG, "Display Text = " + displayText);
             ((TextView) findViewById(R.id.textView3)).setText(displayText);
+
+            camCapture.setVisibility(View.VISIBLE);
+            pageSelect.setVisibility(View.VISIBLE);
+        } else {
+            camCapture.setVisibility(View.GONE);
+            pageSelect.setVisibility(View.GONE);
         }
     }
 
@@ -70,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void serverDLTest(View view) {
+    public void bookBrowser(View view) {
         Log.d(TAG, "Running Book Select test");
 /*
         String board = "Board2";
@@ -92,6 +112,23 @@ public class MainActivity extends AppCompatActivity {
         getApplicationContext().startActivity(intent);
 
     }
+
+    public void pageBrowser(View view) {
+
+        if (mrCme.getCurrentResourceId() != null) {
+            Log.d(TAG, "Running Page Select test");
+            String resId = mrCme.getCurrentResourceId();
+            Intent intent = new Intent(getApplicationContext(), PageBrowser.class);
+            intent.putExtra(PageBrowser.TOKEN, resId);
+            getApplicationContext().startActivity(intent);
+        } else {
+            Toast.makeText(view.getContext(), "Please Select TextBook to MastRead", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
