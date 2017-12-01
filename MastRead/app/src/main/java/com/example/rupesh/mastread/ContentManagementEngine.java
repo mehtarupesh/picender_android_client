@@ -347,6 +347,10 @@ public class ContentManagementEngine implements downloadCallback {
         }
         /* bootstrapping list */
         if (dlFile.getAbsolutePath().contains(serverFileList)) {
+
+            Log.d(TAG, "Downloaded = " + dlFile.getAbsolutePath());
+            Log.d(TAG, "filelist.mastread content = " + MRResource.readFileToString(dlFile.getAbsolutePath(), true));
+
             ArrayList<TextBook> textBookList = mrResource.parseJsonFilelist(dlFile);
             Long entryStart = mrDb.getNumberofEntries();
             for (int i = 0; i < textBookList.size(); i++) {

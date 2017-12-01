@@ -39,7 +39,7 @@ public class MRResource {
 
     private DownloadManager mrDm;
     private downloadCallback mrDlCb;
-    private final String serverAddress= "http:192.168.2.103:8888";
+    private final String serverAddress= "http:148.72.250.59:8888";
     private static String rootDownloadDir = null;
 
     public MRResource(Context context, downloadCallback cb) {
@@ -112,6 +112,8 @@ public class MRResource {
         /* Idea is mp3 files are lazy downloaded when user clicks pic and has page  */
         if (f.exists() /*&& (f.length() > 0  || Page.isJsonFile(f.getAbsolutePath()) || Page.isTextFile(f.getAbsolutePath()))*/) {
             Log.d(TAG, "Found!");
+            Log.d(TAG, "text =" + readFileToString(f.getAbsolutePath(), true));
+
             return true;
         } else {
             Log.d(TAG, "Not found, Downloading!");
